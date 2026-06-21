@@ -9,10 +9,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.ai.features import run_feature
+from app.ai.providers import set_llm_override
 from app.core.deps import Principal
 from app.core.enums import AIJobStatus, AIOutputStatus
 from app.models.ai import AICitation, AIFeature, AIJob, AIOutput, AIUsageLedger
 from app.services import audit
+from app.services.ai_config import estimate_cost, resolve_metered_llm
 
 
 def run_job(db: Session, principal: Principal, job: AIJob) -> AIOutput:
@@ -25,9 +27,14 @@ def run_job(db: Session, principal: Principal, job: AIJob) -> AIOutput:
     )
     requires_citations = feature.requires_citations if feature else True
 
+    # Resolve the configured provider (DB key/mode) and meter token usage.
+    metered, model = resolve_metered_llm(db, principal.organization_id)
+    set_llm_override(metered)
+
     job.status = AIJobStatus.RUNNING
     job.started_at = datetime.now(tz=UTC)
-    job.provider = "mock"
+    job.provider = metered.name
+    job.model_id = model
     db.flush()
 
     try:
@@ -37,6 +44,7 @@ def run_job(db: Session, principal: Principal, job: AIJob) -> AIOutput:
         job.error = str(exc)[:1000]
         job.finished_at = datetime.now(tz=UTC)
         db.flush()
+        set_llm_override(None)
         raise
 
     # Guardrail: fact-based features must cite sources or declare insufficiency.
@@ -85,12 +93,15 @@ def run_job(db: Session, principal: Principal, job: AIJob) -> AIOutput:
             organization_id=principal.organization_id,
             job_id=job.id,
             feature_code=job.feature_code,
-            model_id=job.model_id or "mock-llm-1",
-            input_tokens=0,
-            output_tokens=0,
-            estimated_cost=0,
+            model_id=metered.model_id,
+            input_tokens=metered.input_tokens,
+            output_tokens=metered.output_tokens,
+            estimated_cost=estimate_cost(
+                metered.model_id, metered.input_tokens, metered.output_tokens
+            ),
         )
     )
+    set_llm_override(None)
     audit.record(
         db,
         action="ai.job.run",

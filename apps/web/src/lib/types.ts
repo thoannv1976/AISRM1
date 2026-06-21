@@ -116,3 +116,41 @@ export interface Suggestion {
   excluded: boolean;
   exclusion_reason?: string | null;
 }
+
+export interface AIConfig {
+  mode: string;
+  provider: string;
+  llm_model: string;
+  embedding_model: string;
+  monthly_budget: number;
+  currency: string;
+  api_key_masked?: string | null;
+  api_key_source: string;
+  effective_provider: string;
+  effective_label: string;
+  effective_model: string;
+  available_models: string[];
+  last_test_at?: string | null;
+  last_test_ok?: boolean | null;
+  last_test_message?: string | null;
+}
+
+export interface AIUsage {
+  calls: number;
+  jobs: number;
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  estimated_cost: number;
+  currency: string;
+  monthly_budget: number;
+}
+
+export interface AIFeature {
+  id: string;
+  code: string;
+  name: string;
+  risk_level: string;
+  enabled: boolean;
+  requires_citations: boolean;
+}

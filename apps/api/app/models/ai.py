@@ -24,6 +24,27 @@ from app.core.base import BaseModel
 from app.core.enums import AIJobStatus, AIOutputStatus
 
 
+class AISetting(BaseModel):
+    """Per-organization AI configuration (singleton). The API key is stored
+    encrypted; only the last 4 chars are kept for display."""
+
+    __tablename__ = "ai_settings"
+    __table_args__ = (UniqueConstraint("organization_id", name="uq_ai_setting_org"),)
+
+    organization_id: Mapped[uuid.UUID] = mapped_column(PGUUID(as_uuid=True), index=True)
+    mode: Mapped[str] = mapped_column(String(20), default="AUTO")  # AUTO | CLAUDE | MOCK
+    provider: Mapped[str] = mapped_column(String(20), default="anthropic")  # anthropic | vertex_ai
+    llm_model: Mapped[str] = mapped_column(String(80), default="claude-opus-4-8")
+    embedding_model: Mapped[str] = mapped_column(String(80), default="mock-embed-768")
+    api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    api_key_last4: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    monthly_budget: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=100)
+    currency: Mapped[str] = mapped_column(String(3), default="USD")
+    last_test_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_test_ok: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    last_test_message: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
+
 class AIFeature(BaseModel):
     """A configurable AI feature (AI-01..AI-25) with risk level and flags."""
 

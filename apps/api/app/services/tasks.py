@@ -3,6 +3,7 @@
 The API enqueues jobs; in local/dev the LocalTaskQueue runs them inline so no
 broker is required. With TASK_DRIVER=redis a separate worker consumes them.
 """
+
 from __future__ import annotations
 
 import json

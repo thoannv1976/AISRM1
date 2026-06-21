@@ -76,3 +76,53 @@ class FeatureOut(IdMixin):
     risk_level: str
     enabled: bool
     requires_citations: bool
+
+
+class FeatureToggleIn(BaseModel):
+    enabled: bool
+
+
+class AIConfigOut(BaseModel):
+    mode: str
+    provider: str
+    llm_model: str
+    embedding_model: str
+    monthly_budget: float
+    currency: str
+    api_key_masked: str | None = None
+    api_key_source: str  # DB | ENV | NONE
+    effective_provider: str
+    effective_label: str
+    effective_model: str
+    available_models: list[str]
+    last_test_at: str | None = None
+    last_test_ok: bool | None = None
+    last_test_message: str | None = None
+
+
+class AIConfigIn(BaseModel):
+    mode: str | None = None  # AUTO | CLAUDE | MOCK
+    provider: str | None = None  # anthropic | vertex_ai
+    llm_model: str | None = None
+    monthly_budget: float | None = None
+    api_key: str | None = None  # empty/None = keep current
+    clear_key: bool = False
+
+
+class AITestOut(BaseModel):
+    ok: bool
+    message: str
+    latency_ms: int
+    provider: str
+    model: str
+
+
+class AIUsageOut(BaseModel):
+    calls: int
+    jobs: int
+    input_tokens: int
+    output_tokens: int
+    total_tokens: int
+    estimated_cost: float
+    currency: str
+    monthly_budget: float

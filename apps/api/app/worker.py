@@ -5,6 +5,7 @@ Run with: ``python -m app.worker``
 - TASK_DRIVER=redis: consume tasks from the shared Redis list.
 - otherwise: idle (the API processes tasks inline in local/dev).
 """
+
 from __future__ import annotations
 
 import json

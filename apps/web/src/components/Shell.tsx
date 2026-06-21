@@ -22,6 +22,7 @@ const NAV: NavItem[] = [
   { href: "/researchers", label: "Nhà nghiên cứu", perm: "researchers.read", icon: "👤" },
   { href: "/documents", label: "Kho tài liệu", perm: "documents.read", icon: "🗄" },
   { href: "/copilot", label: "AI Copilot", perm: "ai.run", icon: "✦" },
+  { href: "/ai-config", label: "Cấu hình AI", perm: "admin.config", icon: "🔑" },
   { href: "/admin", label: "Quản trị & Audit", perm: "audit.read", icon: "⚙" },
 ];
 

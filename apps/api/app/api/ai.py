@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.ai.prompts import SYSTEM_CONTRACT
-from app.ai.providers import get_llm
+from app.ai.providers import get_llm, set_llm_override
 from app.ai.rag import retrieve
 from app.ai.runner import run_job
 from app.api._helpers import get_org_scoped
@@ -20,18 +20,23 @@ from app.core.deps import Principal, require
 from app.core.enums import AIOutputStatus
 from app.core.errors import AIFeatureDisabled
 from app.core.pagination import Page, PageParams, build_page, page_params, paginate
-from app.models.ai import AICitation, AIFeature, AIFeedback, AIJob, AIOutput
+from app.models.ai import AICitation, AIFeature, AIFeedback, AIJob, AIOutput, AIUsageLedger
 from app.schemas.ai import (
+    AIConfigIn,
+    AIConfigOut,
     AIJobCreate,
     AIJobOut,
     AIOutputOut,
+    AITestOut,
+    AIUsageOut,
     ChatIn,
     ChatOut,
     CitationOut,
     FeatureOut,
+    FeatureToggleIn,
     FeedbackIn,
 )
-from app.services import audit
+from app.services import ai_config, audit
 
 router = APIRouter()
 
@@ -47,6 +52,101 @@ def list_features(
         .order_by(AIFeature.code)
     ).all()
     return [FeatureOut.model_validate(f) for f in rows]
+
+
+# ---------------------------------------------------------------------------
+# AI configuration & key management (admin)
+# ---------------------------------------------------------------------------
+@router.get("/config", response_model=AIConfigOut)
+def get_ai_config(
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("admin.config")),
+) -> AIConfigOut:
+    setting = ai_config.get_setting(db, principal.organization_id)
+    return AIConfigOut(**ai_config.masked(setting))
+
+
+@router.put("/config", response_model=AIConfigOut)
+def save_ai_config(
+    payload: AIConfigIn,
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("admin.config")),
+) -> AIConfigOut:
+    setting = ai_config.get_setting(db, principal.organization_id)
+    ai_config.save_config(
+        db,
+        setting,
+        mode=payload.mode,
+        provider=payload.provider,
+        llm_model=payload.llm_model,
+        monthly_budget=payload.monthly_budget,
+        api_key=payload.api_key,
+        clear_key=payload.clear_key,
+    )
+    # Audit the change WITHOUT the key value.
+    audit.record(
+        db,
+        action="ai.config.save",
+        actor_id=principal.id,
+        organization_id=principal.organization_id,
+        entity_type="ai_setting",
+        entity_id=setting.id,
+        metadata={
+            "mode": setting.mode,
+            "provider": setting.provider,
+            "model": setting.llm_model,
+            "key_changed": bool(payload.api_key) or payload.clear_key,
+        },
+    )
+    return AIConfigOut(**ai_config.masked(setting))
+
+
+@router.post("/config/test", response_model=AITestOut)
+def test_ai_config(
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("admin.config")),
+) -> AITestOut:
+    setting = ai_config.get_setting(db, principal.organization_id)
+    result = ai_config.test_connection(db, setting)
+    audit.record(
+        db,
+        action="ai.config.test",
+        actor_id=principal.id,
+        organization_id=principal.organization_id,
+        entity_type="ai_setting",
+        entity_id=setting.id,
+        metadata={"ok": result["ok"]},
+    )
+    return AITestOut(**result)
+
+
+@router.get("/usage", response_model=AIUsageOut)
+def get_ai_usage(
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("ai.read", "admin.config")),
+) -> AIUsageOut:
+    return AIUsageOut(**ai_config.usage_summary(db, principal.organization_id))
+
+
+@router.patch("/features/{feature_id}/toggle", response_model=FeatureOut)
+def toggle_feature(
+    feature_id: uuid.UUID,
+    payload: FeatureToggleIn,
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("admin.config")),
+) -> FeatureOut:
+    feature = get_org_scoped(db, AIFeature, feature_id, principal)
+    feature.enabled = payload.enabled
+    audit.record(
+        db,
+        action="ai.feature.toggle",
+        actor_id=principal.id,
+        organization_id=principal.organization_id,
+        entity_type="ai_feature",
+        entity_id=feature.id,
+        metadata={"enabled": payload.enabled, "code": feature.code},
+    )
+    return FeatureOut.model_validate(feature)
 
 
 @router.post("/jobs", response_model=AIOutputOut, status_code=201)
@@ -174,10 +274,25 @@ def chat(
     context = "\n\n".join(
         f"[c{i + 1}] (từ '{c.document_title}'): {c.text[:500]}" for i, c in enumerate(chunks)
     )
+    metered, model = ai_config.resolve_metered_llm(db, principal.organization_id)
+    set_llm_override(metered)
     res = get_llm().complete(
         SYSTEM_CONTRACT,
         f"Dựa CHỈ trên ngữ cảnh sau, trả lời câu hỏi và trích dẫn [c#].\n\n"
         f"NGỮ CẢNH:\n{context}\n\nCÂU HỎI: {payload.message}",
+    )
+    set_llm_override(None)
+    db.add(
+        AIUsageLedger(
+            organization_id=principal.organization_id,
+            feature_code="RAG_QA",
+            model_id=metered.model_id,
+            input_tokens=metered.input_tokens,
+            output_tokens=metered.output_tokens,
+            estimated_cost=ai_config.estimate_cost(
+                metered.model_id, metered.input_tokens, metered.output_tokens
+            ),
+        )
     )
     citations = [
         CitationOut(

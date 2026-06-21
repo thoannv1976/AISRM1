@@ -1,4 +1,5 @@
 """Handlers executed by the worker (or inline via LocalTaskQueue)."""
+
 from __future__ import annotations
 
 import uuid

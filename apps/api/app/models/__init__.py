@@ -8,6 +8,7 @@ from app.models.ai import (  # noqa: F401
     AIJob,
     AIOutput,
     AIPromptTemplate,
+    AISetting,
     AIUsageLedger,
 )
 from app.models.analytics import (  # noqa: F401

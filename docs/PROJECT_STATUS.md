@@ -17,7 +17,8 @@ Cập nhật theo phiên build đầu tiên. Đối chiếu với roadmap (epic 
 | E10 | AI foundation: LLM/Embedding providers, prompt contract, jobs, RAG citations, usage ledger | ✅ |
 | E11 | AI features: completeness, consistency, summary, classification, duplicate, profile summary | ✅ |
 | E12 | Workflow tasks/notifications/comments, dashboards, report definitions | ✅ |
-| — | Frontend Next.js (12 màn hình chính, role-based nav, AI panel) | ✅ |
+| AI Admin | Quản trị AI: nạp/đổi API key (mã hoá DB), chọn model/chế độ, test kết nối, usage (token/chi phí), kill-switch tính năng | ✅ |
+| — | Frontend Next.js (13 màn hình chính, role-based nav, AI panel, Cấu hình AI) | ✅ |
 
 **Kiểm thử:** 19 pytest (auth, RBAC, proposal flow, AI human-in-the-loop, documents/RAG) — pass.
 Verified qua HTTP thật + TestClient. Frontend build (15 routes) pass.
@@ -29,7 +30,7 @@ Verified qua HTTP thật + TestClient. Frontend build (15 routes) pass.
 - **External portal (M18)**: chưa làm (ngoài MVP).
 - **Reports (M16)**: report_definitions + dashboards có; render Word/PDF/Excel + snapshot freeze chưa.
 - **Storage MinIO/GCS**: driver local hoàn chỉnh; MinIO/GCS có chỗ cắm signed URL thật.
-- **AI provider**: mock chạy offline; Anthropic provider sẵn sàng (cần API key); Vertex là chỗ cắm.
+- **AI provider/key**: admin nạp & quản lý API key qua UI (mã hoá Fernet trong DB), chọn model + chế độ AUTO/CLAUDE/MOCK, test kết nối, theo dõi token/chi phí. Vertex là chỗ cắm.
 - **Alembic**: 1 migration khởi tạo; production dùng expand-and-contract cho thay đổi sau.
 
 ## ⬜ Chưa làm (E13–E14, giai đoạn sau)

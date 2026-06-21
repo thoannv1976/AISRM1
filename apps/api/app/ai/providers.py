@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from contextvars import ContextVar
 from dataclasses import dataclass
 
 from app.core.config import settings
@@ -46,6 +47,28 @@ class EmbeddingProvider:
 
     def embed(self, texts: list[str]) -> list[list[float]]:  # pragma: no cover
         raise NotImplementedError
+
+
+class MeteredLLM(LLMProvider):
+    """Wraps a provider and accumulates token/call usage for one request."""
+
+    def __init__(self, inner: LLMProvider):
+        self.inner = inner
+        self.name = inner.name
+        self.calls = 0
+        self.input_tokens = 0
+        self.output_tokens = 0
+        self.model_id = getattr(inner, "_model", None) or "mock-llm-1"
+
+    def complete(self, system, user, *, json_mode=False, max_tokens=2000, temperature=0.2):
+        res = self.inner.complete(
+            system, user, json_mode=json_mode, max_tokens=max_tokens, temperature=temperature
+        )
+        self.calls += 1
+        self.input_tokens += res.input_tokens or 0
+        self.output_tokens += res.output_tokens or 0
+        self.model_id = res.model_id
+        return res
 
 
 # ---------------------------------------------------------------------------
@@ -121,16 +144,32 @@ class AnthropicLLM(LLMProvider):
 
 
 # ---------------------------------------------------------------------------
-# Factories
+# Factories & per-request override
 # ---------------------------------------------------------------------------
-def get_llm() -> LLMProvider:
-    provider = settings.llm_provider.lower()
-    if provider == "anthropic" and settings.anthropic_api_key:
+_llm_override: ContextVar[LLMProvider | None] = ContextVar("llm_override", default=None)
+
+
+def set_llm_override(llm: LLMProvider | None) -> None:
+    """Bind the LLM used by feature builders for the current request/job."""
+    _llm_override.set(llm)
+
+
+def build_llm(provider: str, model: str, api_key: str | None) -> LLMProvider:
+    """Construct a concrete provider; fall back to mock if not available."""
+    provider = (provider or "mock").lower()
+    if provider == "anthropic" and api_key:
         try:
-            return AnthropicLLM(settings.llm_model, settings.anthropic_api_key)
-        except Exception:  # noqa: BLE001 - fall back to mock if SDK missing
+            return AnthropicLLM(model, api_key)
+        except Exception:  # noqa: BLE001 - SDK missing or bad key -> mock
             return MockLLM()
     return MockLLM()
+
+
+def get_llm() -> LLMProvider:
+    override = _llm_override.get()
+    if override is not None:
+        return override
+    return build_llm(settings.llm_provider, settings.llm_model, settings.anthropic_api_key)
 
 
 def get_embedder() -> EmbeddingProvider:
