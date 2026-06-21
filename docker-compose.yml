@@ -1,0 +1,99 @@
+# ============================================================================
+# AISRM1 — AI-ResearchHub — Local development stack (Docker Compose)
+# Runs entirely offline: Postgres+pgvector, MinIO, Redis, API, Worker, Web.
+# ============================================================================
+name: aisrm1
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aisrm1}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aisrm1}
+      POSTGRES_DB: ${POSTGRES_DB:-aisrm1}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/00_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aisrm1} -d ${POSTGRES_DB:-aisrm1}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-aisrm1}:${POSTGRES_PASSWORD:-aisrm1}@db:5432/${POSTGRES_DB:-aisrm1}
+      STORAGE_DRIVER: minio
+      TASK_DRIVER: redis
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      redis:
+        condition: service_started
+    command: >
+      sh -c "python -m app.cli migrate &&
+             python -m app.cli seed --demo &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  worker:
+    build:
+      context: .
+      dockerfile: infra/docker/worker.Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-aisrm1}:${POSTGRES_PASSWORD:-aisrm1}@db:5432/${POSTGRES_DB:-aisrm1}
+      STORAGE_DRIVER: minio
+      TASK_DRIVER: redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    command: python -m app.worker
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/web.Dockerfile
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  db_data:
+  minio_data:

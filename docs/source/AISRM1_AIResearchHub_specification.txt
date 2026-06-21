@@ -1,0 +1,1473 @@
+BẢN MÔ TẢ PHẦN MỀM
+AISRM1
+AI-ResearchHub
+AI-integrated Scientific Research Management System
+Hệ thống Quản lý Khoa học & Công nghệ tích hợp AI — dành cho Phòng Quản lý khoa học
+Tài liệu đặc tả kỹ thuật toàn diện — sẵn sàng cho Claude Code build & chạy trên Google Cloud
+Complete software specification, build-ready for Claude Code, deployable on Google Cloud
+Phiên bản 1.0  ·  Tháng 6 năm 2026
+
+MỤC LỤC
+
+
+
+0. Cách sử dụng tài liệu này
+Tài liệu này là đặc tả phần mềm hoàn chỉnh (software specification) để Claude Code xây dựng ứng dụng AISRM1 – AI-ResearchHub, hệ thống quản lý hoạt động khoa học và công nghệ (KH&CN) dành cho Phòng Quản lý khoa học của cơ sở giáo dục đại học/viện nghiên cứu.
+Tài liệu gồm 10 phần (A–J). Phần nghiệp vụ viết bằng tiếng Việt; các thuật ngữ kỹ thuật, tên bảng dữ liệu, API, trường (field), prompt mẫu và mã nguồn giữ nguyên tiếng Anh để Claude Code triển khai chính xác và nhất quán.
+Cách dùng được khuyến nghị: tạo repository GitHub tên aisrm1, chép nội dung tài liệu này vào thư mục docs/ (có thể tách thành các file con như gợi ý ở Phần J), rồi dùng prompt khởi đầu ở Phần J để Claude Code dựng khung dự án và build theo từng epic, triển khai lên Google Cloud Run.
+Nguyên tắc cốt lõi: AI hỗ trợ — con người quyết định (human-in-the-loop). Mọi nội dung AI tạo ra (gợi ý phản biện, cảnh báo trùng lặp, chấm điểm công trình, dự thảo báo cáo...) đều ở trạng thái “gợi ý”, phải được người có thẩm quyền kiểm tra và phê duyệt trước khi dùng chính thức. AI luôn trích dẫn nguồn dữ liệu và không tự tạo số liệu khi hệ thống chưa có dữ liệu.
+Bảng thuật ngữ
+Ký hiệu / Thuật ngữ
+Ý nghĩa
+AISRM1
+Tên sản phẩm — AI Scientific Research Management (phiên bản 1)
+AI-ResearchHub
+Tên thương hiệu của hệ thống
+Phòng QLKH
+Phòng Quản lý khoa học — đơn vị đầu mối quản lý hoạt động KH&CN
+Đề tài / Dự án
+Nhiệm vụ KH&CN (research project) các cấp: cơ sở, bộ, tỉnh, nhà nước, hợp tác
+Thuyết minh
+Research proposal — đề cương thuyết minh đề tài
+Nghiệm thu
+Acceptance/evaluation — đánh giá kết quả đề tài
+Công bố
+Publication — bài báo, sách, kỷ yếu khoa học
+SHTT / IP
+Sở hữu trí tuệ — sáng chế, giải pháp hữu ích, bản quyền
+Hội đồng KH
+Hội đồng khoa học: tuyển chọn, xét duyệt, nghiệm thu, phản biện
+Bibliometrics
+Trắc lượng khoa học: trích dẫn, h-index, IF, đồng tác giả
+RAG
+Retrieval-Augmented Generation — sinh nội dung có truy hồi dữ liệu nội bộ
+RBAC
+Role-Based Access Control — phân quyền theo vai trò
+ORCID / Scopus / Crossref
+CSDL định danh & trắc lượng nhà khoa học, công bố quốc tế
+KPI nghiên cứu
+Chỉ tiêu KH&CN: số công bố, đề tài, kinh phí, chuyển giao...
+
+A. Tổng quan sản phẩm (Product Requirements)
+A.1. Giới thiệu & bối cảnh
+AISRM1 – AI-ResearchHub là hệ thống web hỗ trợ Phòng Quản lý khoa học và toàn bộ cộng đồng nghiên cứu của nhà trường quản lý vòng đời hoạt động KH&CN: từ thông báo và đăng ký đề tài, xét chọn, ký hợp đồng, triển khai, quản lý kinh phí, nghiệm thu, đến quản lý công bố khoa học, sở hữu trí tuệ, hội thảo, hợp tác và thống kê báo cáo.
+Điểm khác biệt cốt lõi: AISRM1 không chỉ là phần mềm quản lý hồ sơ hành chính, mà là nền tảng “quản trị khoa học dựa trên dữ liệu và AI”. AI được tích hợp để trích xuất dữ liệu công bố, phát hiện trùng lặp thuyết minh, gợi ý phản biện theo chuyên môn, phân tích trắc lượng khoa học, kiểm tra liêm chính học thuật, dự thảo báo cáo thống kê và hỏi đáp trên kho dữ liệu KH&CN.
+A.2. Mục tiêu sản phẩm
+Nền tảng dữ liệu KH&CN tập trung: quản lý thống nhất hồ sơ nhà khoa học, đề tài/dự án, công bố, SHTT, hội thảo, kinh phí và hợp tác — một nguồn dữ liệu xác thực (single source of truth).
+Số hóa quy trình quản lý KH&CN: số hóa toàn bộ luồng nghiệp vụ từ đăng ký, xét chọn, hợp đồng, tiến độ, nghiệm thu đến thanh quyết toán và lưu trữ.
+Minh bạch & liêm chính: công khai quy trình hội đồng, kiểm soát xung đột lợi ích, phát hiện đạo văn/trùng lặp, quản lý đạo đức nghiên cứu.
+Ứng dụng AI có kiểm soát: tự động hóa tác vụ lặp lại, hỗ trợ phân tích, gợi ý và cảnh báo, dưới sự phê duyệt của con người.
+Hỗ trợ ra quyết định & KPI: cung cấp dashboard, trắc lượng khoa học và thống kê phục vụ lãnh đạo điều hành và báo cáo cấp trên (Bộ KH&CN, Bộ GD&ĐT).
+A.3. Đối tượng sử dụng (User Personas)
+Nhóm người dùng
+Nhu cầu chính
+Giá trị nhận được
+Ban Giám hiệu / Lãnh đạo
+Giám sát tổng thể KH&CN, ra quyết định
+Dashboard, KPI, báo cáo tóm tắt, cảnh báo rủi ro
+Phòng Quản lý khoa học
+Đầu mối quản lý toàn bộ hoạt động KH&CN
+Cấu hình quy trình, theo dõi đề tài, tổng hợp báo cáo, quản lý hội đồng
+Chủ nhiệm đề tài / dự án
+Đăng ký, triển khai, báo cáo đề tài
+Nộp thuyết minh, cập nhật tiến độ, quản lý kinh phí, nộp sản phẩm
+Nhà khoa học / Giảng viên
+Quản lý hồ sơ & thành tích KH&CN
+Lý lịch khoa học, khai báo công bố, đăng ký nhiệm vụ, tìm tài trợ
+Thành viên hội đồng / Phản biện
+Đánh giá thuyết minh, nghiệm thu
+Nhận phân công, chấm điểm trực tuyến, phiếu nhận xét
+Nhóm nghiên cứu / Khoa, Viện
+Quản lý hoạt động nhóm/đơn vị
+Theo dõi đề tài, công bố, KPI của đơn vị
+Phòng Tài chính – Kế toán
+Kiểm soát kinh phí KH&CN
+Theo dõi hợp đồng, giải ngân, thanh quyết toán
+Phòng Hợp tác & Đối ngoại
+Quản lý hợp tác, tài trợ ngoài
+Đối tác, biên bản hợp tác, nguồn tài trợ quốc tế
+Sinh viên / Học viên
+Tham gia NCKH sinh viên
+Đăng ký đề tài SV, nộp sản phẩm, theo dõi kết quả
+Bên liên quan (phân quyền)
+Đối tác, doanh nghiệp, quỹ tài trợ
+Truy cập thông tin được phân quyền, chuyển giao công nghệ
+A.4. Phạm vi & nguyên tắc thiết kế
+Trong phạm vi (In-scope)
+Quản lý hồ sơ nhà khoa học (researcher profile), nhóm nghiên cứu; tích hợp ORCID/Scopus.
+Quản lý thông báo & đăng ký nhiệm vụ KH&CN (calls for proposals) và vòng đời đề tài/dự án.
+Quản lý hội đồng khoa học: tuyển chọn, xét duyệt, nghiệm thu, phản biện; gợi ý phản biện bằng AI.
+Quản lý kinh phí, hợp đồng, giải ngân, thanh quyết toán đề tài.
+Quản lý công bố khoa học, tính điểm công trình, đối chiếu CSDL ngoài; quản lý SHTT.
+Quản lý hội nghị/hội thảo, NCKH sinh viên, hợp tác & chuyển giao công nghệ.
+Liêm chính học thuật: phát hiện trùng lặp/đạo văn, quản lý đạo đức nghiên cứu, xung đột lợi ích.
+Khen thưởng, KPI nghiên cứu; báo cáo & thống kê KH&CN; dashboard.
+Tính năng AI: trích xuất, tóm tắt, gợi ý phản biện, trắc lượng, cảnh báo, chatbot RAG, dự thảo báo cáo.
+Phân quyền RBAC, audit log, quy trình phê duyệt cấu hình được.
+Ngoài phạm vi (Out-of-scope) — phiên bản đầu
+Hệ thống kế toán/tài chính tổng thể của trường — chỉ quản lý kinh phí KH&CN và đồng bộ dữ liệu.
+Hệ thống quản lý đào tạo (LMS), nhân sự tổng thể — chỉ tích hợp dữ liệu liên quan.
+Tạp chí khoa học điện tử (OJS) đầy đủ — chỉ quản lý công bố, có thể tích hợp sau.
+Ứng dụng di động native (web responsive là đủ cho MVP).
+Nguyên tắc thiết kế (Design Principles)
+Human-in-the-loop: AI chỉ gợi ý; con người phê duyệt. Mọi đầu ra AI có trạng thái suggestion/draft.
+Truy xuất nguồn gốc (traceability): mọi quyết định hội đồng, điểm số, cảnh báo AI đều liên kết tới nguồn và được lưu vết.
+Cấu hình hóa: loại nhiệm vụ, quy trình xét chọn/nghiệm thu, công thức tính điểm công trình, vai trò phải cấu hình được, không hard-code.
+Phân tách lưu trữ: file gốc, metadata và dữ liệu AI lưu ở 3 lớp riêng (xem Phần B.4).
+Liêm chính & bảo mật: kiểm soát xung đột lợi ích trong hội đồng; AI tuân thủ đúng quyền của người dùng.
+MVP trước, mở rộng sau: không over-engineer; ưu tiên kiến trúc sạch, dễ bảo trì, mở rộng dần.
+A.5. Yêu cầu phi chức năng (Non-functional Requirements)
+Hạng mục
+Yêu cầu
+Hiệu năng
+Trang tải < 2s ở điều kiện thường; xử lý tài liệu & đối chiếu CSDL ngoài chạy nền (async).
+Khả năng mở rộng
+Kiến trúc stateless, container hóa, scale theo request (Cloud Run).
+Bảo mật
+JWT auth, RBAC, mã hóa khi lưu/truyền, Secret Manager, signed URL cho file; kiểm soát xung đột lợi ích.
+Audit & truy vết
+Ghi log mọi thao tác quan trọng: nộp hồ sơ, chấm điểm, phê duyệt, giải ngân, gợi ý AI.
+Sao lưu & phục hồi
+Backup tự động hằng ngày DB; point-in-time recovery; versioning file hồ sơ.
+Tích hợp
+API/đồng bộ với ORCID, Scopus, Crossref, hệ thống nhân sự, tài chính, kho học liệu.
+Đa ngôn ngữ
+Giao diện song ngữ Việt/Anh; xử lý tài liệu tiếng Việt và tiếng Anh.
+Khả dụng
+Mục tiêu uptime ≥ 99% cho môi trường production.
+Tuân thủ
+Quy chế quản lý KH&CN của trường/Bộ; nguyên tắc quản trị rủi ro AI (NIST AI RMF); bảo vệ dữ liệu cá nhân.
+
+B. Kiến trúc & công nghệ (Architecture & Tech Stack)
+B.1. Tech stack đề xuất
+Stack được chọn để Claude Code build nhanh, test cục bộ bằng Docker, và triển khai trọn vẹn trên Google Cloud cho production. Ưu tiên công cụ phổ biến, tài liệu phong phú, phù hợp xử lý tài liệu, đối chiếu CSDL khoa học và AI.
+Lớp
+Công nghệ đề xuất
+Lý do chọn
+Frontend
+Next.js 14 (App Router) + TypeScript + Tailwind CSS + shadcn/ui + TanStack Query
+UI dashboard/bảng/biểu mẫu hồ sơ KH&CN nhanh, hiện đại, SSR/CSR linh hoạt.
+Backend
+FastAPI (Python 3.11+) + Pydantic v2 + SQLAlchemy 2.0 + Alembic
+Python thuận lợi cho xử lý tài liệu, trắc lượng, AI; FastAPI nhanh, type-safe, tự sinh OpenAPI.
+Database
+Cloud SQL for PostgreSQL 16 + pgvector
+Dữ liệu nghiệp vụ quan hệ + vector embedding cho RAG trong một DB; managed, có PITR.
+File storage
+Google Cloud Storage (prod) / MinIO hoặc local FS (dev)
+Object storage cho thuyết minh, hợp đồng, sản phẩm, bài báo PDF; tách khỏi DB.
+AI – LLM
+Claude API (Anthropic) — Claude Sonnet cho phân tích, Claude Haiku cho tác vụ nhẹ (đổi được sang Vertex AI)
+Chất lượng cao cho phân tích văn bản học thuật tiếng Việt/Anh.
+AI – Embeddings
+Mô hình embedding đa ngôn ngữ (Voyage AI multilingual / multilingual-e5 self-host)
+Hỗ trợ tiếng Việt tốt cho semantic search & phát hiện trùng lặp thuyết minh.
+Xử lý tài liệu
+PyMuPDF, python-docx, openpyxl; Google Document AI / Tesseract (scan); GROBID (bóc tách metadata bài báo)
+Trích xuất nội dung & metadata từ thuyết minh, hợp đồng, bài báo.
+Tích hợp ngoài
+Crossref API, OpenAlex/Scopus API, ORCID API
+Đối chiếu công bố, trắc lượng, định danh nhà khoa học.
+Hàng đợi nền
+Celery + Redis (dev) ; Cloud Tasks + Cloud Run Jobs (prod)
+Xử lý nền: trích xuất, embedding, đối chiếu CSDL, kiểm tra trùng lặp.
+Auth
+JWT (access + refresh); tùy chọn Google Identity Platform/Firebase Auth (SSO, MFA)
+MVP kiểm soát RBAC; nâng cấp SSO với tài khoản trường sau.
+CI/CD
+GitHub Actions → build Docker → Artifact Registry → Cloud Run
+Tự động hóa kiểm thử & triển khai có kiểm soát theo nhánh.
+Secrets
+Google Secret Manager (prod) / file .env (dev)
+Lưu khóa API (Claude, Scopus, ORCID), mật khẩu DB an toàn.
+Quan sát hệ thống
+Cloud Logging + Error Reporting + Cloud Monitoring
+Theo dõi lỗi, hiệu năng, audit.
+Lưu ý cho Claude Code: MVP chạy hoàn toàn bằng Docker Compose trên máy local (Postgres+pgvector + Redis + MinIO + backend + frontend). Phần Google Cloud kích hoạt khi deploy production. Dùng abstraction cho storage (StorageService), cho LLM (LLMProvider) và cho nguồn trắc lượng (BibliometricProvider: Crossref/OpenAlex/Scopus) để đổi nhà cung cấp mà không sửa nghiệp vụ.
+B.2. Kiến trúc tổng thể trên Google Cloud
+                          ┌───────────────────────────┐
+        Người dùng  ──────▶│  Frontend Web (Next.js)   │  Cloud Run
+                          └─────────────┬─────────────┘
+                                        │  HTTPS / REST (OpenAPI)
+                                        ▼
+                          ┌───────────────────────────┐
+                          │   Backend API (FastAPI)    │  Cloud Run
+                          │  Auth · RBAC · Nghiệp vụ   │
+                          └──┬───────┬───────┬─────────┘
+            ┌────────────────┘       │       └───────────────┐
+            ▼                        ▼                       ▼
+   ┌─────────────────┐     ┌──────────────────┐    ┌──────────────────┐
+   │  Cloud SQL      │     │  Cloud Storage   │    │  Cloud Run Jobs  │
+   │  PostgreSQL     │     │  file hồ sơ KHCN │    │  + Cloud Tasks   │
+   │  + pgvector     │     │  (thuyết minh,   │    │  worker: trích   │
+   │  dữ liệu+vector │     │  hợp đồng, PDF)  │    │  xuất·embed·AI   │
+   └─────────────────┘     └──────────────────┘    └────────┬─────────┘
+                                                            │
+                              ┌─────────────────────────────▼───────────────────┐
+                              │  AI & nguồn dữ liệu ngoài                        │
+                              │  Claude API · Embeddings · Document AI           │
+                              │  Crossref · OpenAlex/Scopus · ORCID              │
+                              └──────────────────────────────────────────────────┘
+   Secret Manager · Cloud Logging/Monitoring · GitHub Actions (CI/CD) bao quanh hệ thống
+B.3. Cấu trúc repository (monorepo)
+aisrm1/
+├── apps/
+│   ├── web/                 # Next.js frontend (TypeScript)
+│   │   ├── app/             # App Router: pages theo module
+│   │   ├── components/      # UI components (shadcn/ui)
+│   │   ├── lib/             # api client, hooks, utils
+│   │   └── ...
+│   └── api/                 # FastAPI backend (Python)
+│       ├── app/
+│       │   ├── main.py
+│       │   ├── core/        # config, security, deps
+│       │   ├── db/          # session, base, migrations (alembic), seed
+│       │   ├── models/      # SQLAlchemy models
+│       │   ├── schemas/     # Pydantic schemas
+│       │   ├── api/         # routers theo module (v1/)
+│       │   ├── services/    # business logic
+│       │   ├── ai/          # LLMProvider, prompts, RAG, rule-engine
+│       │   ├── integrations/# Crossref, OpenAlex, ORCID, Scopus clients
+│       │   ├── storage/     # StorageService (GCS/MinIO)
+│       │   ├── workers/     # Celery / Cloud Run Jobs tasks
+│       │   └── tests/       # pytest
+│       └── pyproject.toml
+├── packages/
+│   └── shared/              # types/enums dùng chung (sinh từ OpenAPI)
+├── infra/
+│   ├── docker/              # Dockerfile cho web & api
+│   ├── docker-compose.yml   # môi trường dev đầy đủ
+│   ├── cloudbuild.yaml      # build & deploy Cloud Run
+│   └── terraform/           # (tùy chọn) hạ tầng GCP
+├── docs/                    # PRD, schema, API, AI spec, deployment...
+│   ├── 01_PRD.md   02_MVP_SCOPE.md   03_USER_ROLES_PERMISSIONS.md
+│   ├── 04_DATABASE_SCHEMA.md   05_API_SPEC.md   06_AI_FEATURES_SPEC.md
+│   ├── 07_UI_SCREEN_LIST.md   08_REPORT_LIST.md   09_DEPLOYMENT_GUIDE.md
+├── .github/workflows/       # CI/CD
+├── CLAUDE.md                # hướng dẫn cho Claude Code (xem Phần J)
+└── README.md
+B.4. Mô hình lưu trữ 3 lớp
+Nguyên tắc bắt buộc: KHÔNG lưu file gốc trong cơ sở dữ liệu quan hệ. Hồ sơ KH&CN được quản lý theo ba lớp tách biệt:
+Lớp
+Lưu ở đâu
+Nội dung
+Lớp 1 — File gốc
+Cloud Storage / MinIO
+Thuyết minh, hợp đồng, báo cáo, sản phẩm, bài báo PDF, minh chứng tài chính, ảnh scan.
+Lớp 2 — Metadata
+PostgreSQL
+Thông tin đề tài, công bố, hồ sơ nhà khoa học, kinh phí, trạng thái, phiên bản, checksum, storage_path.
+Lớp 3 — Dữ liệu AI
+PostgreSQL (chunks + embeddings/pgvector)
+Text trích xuất, chunks, vector embedding, kết quả phân tích AI phục vụ tìm kiếm, trùng lặp & RAG.
+Cấu trúc đường dẫn file đề xuất trên Object Storage
+/projects/{project_code}/{year}/{doc_type}/{file_name}
+/publications/{researcher_code}/{year}/{pub_id}/{file_name}
+/contracts/{project_code}/{file_name}
+/ip/{ip_code}/{file_name}
+/profiles/{researcher_code}/{file_name}
+ 
+Ví dụ:
+/projects/CS-2026-012/2026/proposal/thuyet-minh-de-tai_v2.docx
+/projects/CS-2026-012/2026/acceptance/bien-ban-nghiem-thu.pdf
+/publications/NGUYENVANA/2025/pub_8842/bai-bao-scopus.pdf
+/contracts/CS-2026-012/hop-dong-thuc-hien-de-tai.pdf
+
+C. Đặc tả chức năng (Functional Specification)
+C.1. Danh sách phân hệ (Modules)
+Hệ thống gồm các phân hệ sau. Cột “GĐ” cho biết module thuộc MVP (GĐ1–3) hay mở rộng (GĐ4–5) — xem lộ trình ở Phần J.
+#
+Phân hệ
+Chức năng chính
+GĐ
+M1
+Auth & RBAC
+Đăng nhập (SSO), refresh token, vai trò, phân quyền theo đơn vị/đề tài
+1
+M2
+Tổ chức & người dùng
+Trường, khoa/viện, bộ môn, người dùng, gán vai trò
+1
+M3
+Hồ sơ nhà khoa học
+Lý lịch khoa học, chuyên môn, ORCID/Scopus, thành tích, h-index
+1
+M4
+Nhóm nghiên cứu
+Quản lý nhóm NC, thành viên, hướng nghiên cứu, sản phẩm
+2
+M5
+Thông báo & đăng ký nhiệm vụ
+Calls for proposals, biểu mẫu đăng ký, đợt xét, hạn nộp
+1-2
+M6
+Quản lý đề tài / dự án
+Vòng đời đề tài: thuyết minh→xét chọn→hợp đồng→tiến độ→nghiệm thu
+1-2
+M7
+Hội đồng khoa học
+Tuyển chọn/xét duyệt/nghiệm thu/phản biện, chấm điểm trực tuyến
+2
+M8
+Kinh phí & hợp đồng
+Dự toán, hợp đồng, giải ngân theo đợt, thanh quyết toán
+2-3
+M9
+Công bố khoa học
+Khai báo/duyệt bài báo, đối chiếu CSDL ngoài, tính điểm công trình
+2-3
+M10
+Sở hữu trí tuệ (SHTT)
+Sáng chế, giải pháp hữu ích, bản quyền, trạng thái đăng ký
+3-4
+M11
+Hội nghị / hội thảo KH
+Đăng ký tổ chức, kỷ yếu, kinh phí, đại biểu
+3-4
+M12
+NCKH sinh viên
+Đăng ký đề tài SV, hướng dẫn, nghiệm thu, giải thưởng
+4
+M13
+Hợp tác & chuyển giao CN
+Đối tác, biên bản hợp tác, hợp đồng chuyển giao, tài trợ ngoài
+4
+M14
+Khen thưởng & KPI
+Quy đổi điểm, khen thưởng, KPI nghiên cứu theo cá nhân/đơn vị
+4
+M15
+Liêm chính học thuật
+Phát hiện trùng lặp/đạo văn, đạo đức NC, xung đột lợi ích
+3-4
+M16
+Xử lý tài liệu AI
+Trích xuất text/metadata, chunk, embedding, tóm tắt
+2-3
+M17
+Chatbot RAG nội bộ
+Hỏi đáp trên kho dữ liệu KH&CN theo phân quyền, trích nguồn
+3
+M18
+Báo cáo, thống kê & Dashboard
+Thống kê KH&CN, trắc lượng, dashboard, xuất Word/PDF/Excel
+1-3
+C.2. Mô tả chi tiết các phân hệ trọng tâm
+M3 — Hồ sơ nhà khoa học (Researcher Profile)
+Quản lý lý lịch khoa học của từng nhà khoa học: thông tin cá nhân, học hàm/học vị, chuyên ngành, hướng nghiên cứu, từ khóa chuyên môn, đề tài đã/đang chủ trì–tham gia, công bố, SHTT, giải thưởng.
+Tích hợp ORCID để định danh; đồng bộ công bố từ Scopus/OpenAlex/Crossref (có xác nhận của người dùng).
+Tự động tính các chỉ số trắc lượng: số công bố, tổng trích dẫn, h-index, i10-index (AI-8).
+Hồ sơ chuyên môn (keywords + embedding) phục vụ gợi ý phản biện và tìm kiếm chuyên gia.
+Trang hồ sơ công khai (tùy chọn) phục vụ kết nối hợp tác.
+M6 — Quản lý đề tài / dự án (trọng tâm)
+Quản lý toàn bộ vòng đời nhiệm vụ KH&CN các cấp (cơ sở, bộ/ngành, tỉnh, nhà nước, hợp tác/tài trợ). Hỗ trợ nhiều loại nhiệm vụ với biểu mẫu và quy trình cấu hình được.
+Nộp thuyết minh trực tuyến theo biểu mẫu; quản lý phiên bản thuyết minh.
+Quy trình xét chọn qua hội đồng (M7); ký hợp đồng và dự toán kinh phí (M8).
+Quản lý tiến độ theo mốc (milestones), sản phẩm cam kết, báo cáo định kỳ.
+Nghiệm thu: hội đồng nghiệm thu, biên bản, xếp loại, sản phẩm giao nộp, lưu trữ.
+AI hỗ trợ: tóm tắt thuyết minh, phát hiện trùng lặp với đề tài đã có (AI-3), rà soát tính khả thi/ngân sách (AI-10), cảnh báo tiến độ (AI-11).
+M7 — Hội đồng khoa học & gợi ý phản biện
+Quản lý các loại hội đồng (tuyển chọn, xét duyệt thuyết minh, nghiệm thu) và quy trình phản biện. Hỗ trợ chấm điểm trực tuyến theo phiếu/tiêu chí, tổng hợp điểm, kết luận hội đồng.
+AI gợi ý phản biện/thành viên hội đồng theo độ khớp chuyên môn (AI-4) — đối sánh embedding thuyết minh với hồ sơ chuyên gia.
+Kiểm soát xung đột lợi ích: loại trừ người cùng đơn vị/đồng tác giả/người thân; cảnh báo tự động.
+Phiếu nhận xét & chấm điểm số hóa; ẩn danh khi cần (blind review).
+Tổng hợp kết quả, biên bản hội đồng, kết luận và kiến nghị.
+M9 — Công bố khoa học & tính điểm công trình
+Khai báo và quản lý công bố (bài báo ISI/Scopus, tạp chí trong nước, sách, kỷ yếu hội thảo). Đối chiếu với CSDL ngoài để xác thực chỉ số (IF, quartile, trích dẫn).
+AI trích xuất metadata từ file/DOI (AI-2); đối chiếu Crossref/OpenAlex/Scopus (AI-14) để tự điền và xác thực.
+Tính điểm công trình tự động theo công thức cấu hình được của trường (AI-16) — phân chia điểm theo đồng tác giả.
+Liên kết công bố với đề tài, nhóm nghiên cứu, nhà khoa học và KPI.
+Quy trình duyệt công bố để tính khen thưởng/KPI; chống khai trùng.
+C.3. Vai trò & ma trận phân quyền (RBAC)
+RBAC hai lớp: (1) vai trò hệ thống quy định khả năng tổng quát; (2) phạm vi theo đơn vị/đề tài (user scope) quy định người dùng thao tác trên dữ liệu nào. AI luôn tuân thủ đúng phạm vi quyền của người dùng.
+Các vai trò hệ thống
+Vai trò (role)
+Mô tả & quyền tổng quát
+SYSTEM_ADMIN
+Quản trị toàn hệ thống: cấu hình, người dùng, vai trò, biểu mẫu, công thức điểm, sao lưu.
+RESEARCH_OFFICE
+Phòng Quản lý khoa học — đầu mối: cấu hình đợt, quản lý đề tài, hội đồng, tổng hợp báo cáo.
+LEADERSHIP
+Ban Giám hiệu: xem dashboard, KPI, báo cáo tổng hợp, phê duyệt chủ trương; chỉ đọc chi tiết.
+PI
+Chủ nhiệm đề tài (Principal Investigator): quản lý đề tài/dự án của mình, tiến độ, kinh phí, sản phẩm.
+RESEARCHER
+Nhà khoa học/giảng viên: hồ sơ cá nhân, đăng ký nhiệm vụ, khai báo công bố, tìm tài trợ.
+COUNCIL_MEMBER
+Thành viên hội đồng / phản biện: nhận phân công, chấm điểm, viết nhận xét.
+UNIT_MANAGER
+Lãnh đạo khoa/viện/nhóm NC: theo dõi hoạt động & KPI của đơn vị.
+FINANCE
+Phòng Tài chính – Kế toán: kiểm soát hợp đồng, giải ngân, thanh quyết toán.
+PARTNER_OFFICE
+Phòng Hợp tác – Đối ngoại: đối tác, tài trợ ngoài, chuyển giao công nghệ.
+STUDENT
+Sinh viên/học viên: NCKH sinh viên (đăng ký, nộp sản phẩm).
+EXTERNAL
+Bên ngoài (phân quyền): đối tác, quỹ tài trợ, chuyên gia mời — truy cập hạn chế.
+Ma trận quyền theo hành động (trích yếu)
+C = Create, R = Read, U = Update, D = Delete, A = Approve, — = không có quyền.
+Đối tượng / Vai trò
+ADMIN
+QLKH
+PI
+Council
+Finance
+Leadership
+Thông báo/đợt xét
+CRUD
+CRUD
+R
+R
+R
+R
+Đề tài / thuyết minh
+CRUD
+RUA
+CRU
+R
+R
+R
+Hội đồng & chấm điểm
+CRUD
+CRUA
+R
+CRU*
+—
+R
+Kinh phí / hợp đồng
+CRUD
+RU
+RU
+—
+CRUA
+R
+Công bố khoa học
+CRUD
+RUA
+CRU
+R
+—
+R
+Hồ sơ nhà khoa học
+CRUD
+R
+RU*
+R
+—
+R
+KPI & khen thưởng
+CRUD
+CRUA
+R
+—
+R
+RA
+Audit log
+R
+R
+—
+—
+R
+R
+(*) Council chỉ chấm điểm hồ sơ được phân công; PI chỉ sửa hồ sơ/đề tài của chính mình.
+C.4. Vòng đời đề tài & trạng thái
+Mỗi đề tài/dự án đi qua vòng đời được kiểm soát chặt, mỗi bước có người chịu trách nhiệm và lưu vết:
+Draft → Submitted → UnderReview → Approved → Contracted → InProgress
+   │         │            │            │           │            │
+ nháp     đã nộp      hội đồng       được       ký hợp       đang
+ thuyết   thuyết     xét chọn      phê duyệt    đồng+        thực hiện
+ minh     minh                                  dự toán
+                                                              │
+   Extended ◀── (gia hạn)                                     ▼
+   Stopped  ◀── (dừng/thu hồi)        Accepted ◀── Acceptance(nghiệm thu) ◀── Reporting
+                                          │
+                                          ▼
+                                      Liquidated (thanh lý) → Archived (lưu trữ)
+Trạng thái
+Ý nghĩa
+Draft / Submitted
+Chủ nhiệm soạn & nộp thuyết minh trong đợt xét.
+UnderReview
+Hội đồng tuyển chọn/xét duyệt đang đánh giá (có phản biện).
+Approved
+Được phê duyệt cấp kinh phí, chờ ký hợp đồng.
+Contracted
+Đã ký hợp đồng & duyệt dự toán; phân bổ kinh phí.
+InProgress / Reporting
+Đang triển khai; nộp báo cáo định kỳ theo mốc.
+Acceptance / Accepted
+Hội đồng nghiệm thu đánh giá; đạt → Accepted, kèm xếp loại.
+Extended / Stopped
+Gia hạn có phê duyệt / dừng – thu hồi khi vi phạm hoặc bất khả thi.
+Liquidated / Archived
+Thanh lý hợp đồng, quyết toán xong; lưu trữ hồ sơ.
+C.5. Quy trình nghiệp vụ tổng quát (end-to-end)
+Phòng QLKH ra thông báo & mở đợt đăng ký nhiệm vụ KH&CN (cấu hình biểu mẫu, tiêu chí, hạn nộp).
+Nhà khoa học nộp thuyết minh trực tuyến; AI tóm tắt, phân loại lĩnh vực, kiểm tra trùng lặp.
+Phòng QLKH thành lập hội đồng; AI gợi ý phản biện theo chuyên môn, loại trừ xung đột lợi ích.
+Hội đồng tuyển chọn/xét duyệt chấm điểm trực tuyến; tổng hợp kết quả, ra kết luận.
+Phê duyệt danh mục, ký hợp đồng, duyệt dự toán & phân bổ kinh phí (phối hợp Tài chính).
+Triển khai: theo dõi mốc tiến độ, báo cáo định kỳ, giải ngân theo đợt; AI cảnh báo chậm tiến độ.
+Nghiệm thu: hội đồng nghiệm thu đánh giá sản phẩm, xếp loại; lưu biên bản & sản phẩm.
+Khai báo công bố/SHTT phát sinh; tính điểm công trình, KPI, khen thưởng.
+Thanh lý, quyết toán; tổng hợp thống kê KH&CN; lưu trữ & phục vụ chu kỳ sau.
+
+D. Lược đồ cơ sở dữ liệu (Database Schema)
+PostgreSQL 16 + pgvector. Quy ước: tên bảng số nhiều, snake_case; mỗi bảng có id (UUID, khóa chính), created_at, updated_at; xóa mềm bằng deleted_at khi cần. Khóa ngoại đặt tên <entity>_id. Dùng Alembic cho migration.
+D.1. Sơ đồ nhóm bảng
+Nhóm
+Các bảng chính
+Tổ chức & người dùng
+universities, faculties, departments, users, roles, permissions, user_roles, user_scopes
+Nhà khoa học
+researchers, researcher_expertise, research_groups, research_group_members, external_ids (orcid/scopus)
+Đề tài / nhiệm vụ
+calls, project_types, projects, proposals, proposal_versions, milestones, project_members, project_products, project_reports
+Hội đồng
+councils, council_members, review_assignments, review_forms, review_scores, conflict_of_interest
+Kinh phí
+funding_sources, contracts, budgets, budget_items, disbursements, settlements
+Công bố & SHTT
+publications, publication_authors, journals, citation_metrics, work_scores, ip_assets, ip_authors
+Hoạt động KHCN
+conferences, conference_papers, student_projects, collaborations, partners, tech_transfers, awards, kpis
+Liêm chính
+similarity_checks, plagiarism_reports, ethics_reviews
+Vận hành
+tasks, notifications, audit_logs, approval_flows, approval_steps, report_templates
+AI / RAG
+documents, document_chunks, embeddings, ai_analysis_results, ai_prompts, ai_chat_sessions, ai_chat_messages
+D.2. Định nghĩa bảng chi tiết — nhà khoa học & nhóm NC
+researchers
+Cột
+Kiểu
+Mô tả
+id
+UUID PK
+Khóa chính
+user_id
+UUID FK
+→ users.id (nếu có tài khoản)
+code
+VARCHAR
+Mã nhà khoa học
+full_name
+VARCHAR
+Họ tên
+academic_title
+VARCHAR
+Học hàm (GS/PGS)
+degree
+VARCHAR
+Học vị (TS/ThS...)
+department_id
+UUID FK
+Đơn vị công tác → departments.id
+orcid
+VARCHAR
+Mã ORCID
+scopus_id
+VARCHAR
+Scopus Author ID
+h_index, citation_count
+INT
+Chỉ số trắc lượng (đồng bộ/AI tính)
+expertise_vector
+VECTOR(n)
+Embedding hồ sơ chuyên môn (gợi ý phản biện)
+status
+VARCHAR
+active / inactive
+research_groups & researcher_expertise
+research_groups: id, code, name, leader_id (→ researchers), research_direction, faculty_id, status.
+research_group_members: group_id, researcher_id, role_in_group, joined_at.
+researcher_expertise: researcher_id, keyword, field_code (lĩnh vực KH&CN chuẩn), weight.
+external_ids: researcher_id, provider (orcid/scopus/openalex), external_id, synced_at.
+D.3. Định nghĩa bảng chi tiết — đề tài/nhiệm vụ
+calls (thông báo/đợt đăng ký) & projects
+Cột
+Kiểu
+Mô tả
+calls.id
+UUID PK
+Đợt thông báo nhiệm vụ
+calls.code, title
+VARCHAR
+Mã & tiêu đề đợt
+calls.project_type_id
+UUID FK
+Loại nhiệm vụ → project_types.id
+calls.open_at, close_at
+TIMESTAMPTZ
+Thời gian mở/đóng đăng ký
+calls.form_schema
+JSONB
+Cấu hình biểu mẫu thuyết minh (dynamic form)
+projects.id
+UUID PK
+Đề tài/dự án
+projects.code
+VARCHAR
+Mã đề tài (vd CS-2026-012)
+projects.title
+VARCHAR
+Tên đề tài
+projects.call_id
+UUID FK
+→ calls.id
+projects.project_type_id
+UUID FK
+Cấp/loại nhiệm vụ
+projects.field_code
+VARCHAR
+Lĩnh vực KH&CN (AI phân loại gợi ý)
+projects.pi_id
+UUID FK
+Chủ nhiệm → researchers.id
+projects.host_unit_id
+UUID FK
+Đơn vị chủ trì → departments.id
+projects.status
+VARCHAR
+Theo vòng đời (Draft...Archived)
+projects.start_date, end_date
+DATE
+Thời gian thực hiện
+projects.total_budget
+NUMERIC
+Tổng kinh phí
+projects.acceptance_grade
+VARCHAR
+Xếp loại nghiệm thu
+proposals, milestones, project_members, project_products
+proposals / proposal_versions: project_id, version, content (JSONB theo form_schema), file_id, summary (AI), similarity_score, submitted_at.
+milestones: project_id, name, due_date, deliverable, status (pending/done/overdue), progress_percent.
+project_members: project_id, researcher_id, role (chủ nhiệm/thư ký/thành viên), allocation_percent.
+project_products: project_id, product_type (bài báo/sản phẩm/đào tạo), description, committed vs delivered, evidence_file_id.
+project_reports: project_id, report_type (định kỳ/giữa kỳ/tổng kết), period, file_id, status.
+D.4. Hội đồng & kinh phí
+councils, review_assignments, review_scores, conflict_of_interest
+Cột
+Kiểu
+Mô tả
+councils.id
+UUID PK
+Hội đồng (tuyển chọn/xét duyệt/nghiệm thu)
+councils.project_id / call_id
+UUID FK
+Gắn đề tài hoặc đợt
+councils.type
+VARCHAR
+selection / appraisal / acceptance
+council_members.researcher_id
+UUID FK
+Thành viên → researchers.id
+council_members.role
+VARCHAR
+Chủ tịch/phản biện/ủy viên/thư ký
+review_assignments.id
+UUID PK
+Phân công đánh giá 1 hồ sơ cho 1 người
+review_assignments.reviewer_id, project_id
+UUID FK
+Người chấm & đề tài
+review_assignments.suggested_by_ai
+BOOLEAN
+Phản biện do AI gợi ý (đã xác nhận)
+review_forms.criteria
+JSONB
+Bộ tiêu chí & thang điểm (cấu hình)
+review_scores.assignment_id
+UUID FK
+→ review_assignments.id
+review_scores.scores, comments
+JSONB/TEXT
+Điểm theo tiêu chí & nhận xét
+conflict_of_interest.reviewer_id, project_id
+UUID FK
+Cảnh báo/loại trừ xung đột lợi ích
+funding_sources, contracts, budgets, disbursements, settlements
+funding_sources: name, type (ngân sách/tài trợ ngoài/doanh nghiệp/quốc tế), managing_unit.
+contracts: project_id, contract_no, signed_date, total_value, funding_source_id, file_id, status.
+budgets / budget_items: project_id, fiscal_year; item (mục chi), planned_amount, spent_amount.
+disbursements: project_id, phase, amount, disbursed_at, status, evidence_file_id.
+settlements: project_id, amount, approved_by, settled_at, file_id (quyết toán).
+D.5. Công bố, SHTT & KPI
+publications, journals, work_scores
+Cột
+Kiểu
+Mô tả
+publications.id
+UUID PK
+Một công bố khoa học
+publications.title
+VARCHAR
+Tiêu đề
+publications.doi
+VARCHAR
+DOI (đối chiếu Crossref/OpenAlex)
+publications.type
+VARCHAR
+ISI/Scopus/trong nước/sách/kỷ yếu
+publications.journal_id
+UUID FK
+→ journals.id
+publications.year
+INT
+Năm công bố
+publications.project_id
+UUID FK
+Đề tài liên quan (nếu có)
+publications.verified
+BOOLEAN
+Đã đối chiếu CSDL ngoài
+publications.citation_count
+INT
+Số trích dẫn (đồng bộ)
+publication_authors.researcher_id
+UUID FK
+Tác giả; author_order, is_corresponding, contribution_ratio
+journals.name, issn, quartile, impact_factor
+—
+Thông tin tạp chí (Q1–Q4, IF)
+work_scores.publication_id, formula_id
+UUID FK
+Điểm công trình tính theo công thức cấu hình; points_per_author
+ip_assets, conferences, collaborations, awards, kpis
+ip_assets: code, type (sáng chế/GPHI/bản quyền), title, status (nộp đơn/được cấp), project_id, file_id.
+conferences / conference_papers: hội thảo do trường tổ chức/tham gia; kỷ yếu, đại biểu, kinh phí.
+collaborations / partners / tech_transfers: đối tác, biên bản hợp tác, hợp đồng chuyển giao, giá trị.
+awards: researcher_id/project_id, award_name, level, year, decision_file_id.
+kpis: scope (researcher/unit/university), year, metric (số công bố/đề tài/kinh phí/điểm), target, actual.
+D.6. Liêm chính, AI/RAG, audit
+similarity_checks / plagiarism_reports: object_type (proposal/publication), object_id, method, score, matched_refs (JSONB), status; ethics_reviews cho đạo đức NC.
+documents → document_chunks → embeddings: mỗi file gốc tạo 1 document (extracted_text, language); chunk (chunk_text, page, section); embeddings.vector VECTOR(n) + pgvector, model.
+ai_analysis_results: object_type, object_id, feature_code (AI-1..AI-18), output (JSONB), model, confidence, status (suggested/accepted/rejected), reviewed_by.
+ai_chat_sessions / ai_chat_messages: phiên RAG; message lưu role, content, retrieved_chunk_ids (nguồn trích dẫn), scope (phân quyền).
+audit_logs: actor_id, action, entity_type, entity_id, before/after (JSONB), ip, created_at — ghi mọi thao tác gồm cả gợi ý AI và quyết định chấp nhận/từ chối.
+approval_flows / approval_steps: luồng phê duyệt cấu hình được theo loại đối tượng (thuyết minh, hợp đồng, công bố, quyết toán).
+Quan trọng: ai_analysis_results và ai_chat_messages phải lưu nguồn truy hồi (retrieved_chunk_ids / object_ids) để mọi gợi ý/câu trả lời AI đều trích dẫn được dữ liệu nguồn — đáp ứng nguyên tắc traceability và human-in-the-loop.
+
+E. Đặc tả API (API Specification)
+E.1. Quy ước chung
+REST/JSON, base path: /api/v1. FastAPI tự sinh OpenAPI tại /docs (Swagger) và /redoc.
+Xác thực: Bearer JWT (access token). Refresh token qua /auth/refresh.
+Phân trang: ?page=&size=; trả về { items, total, page, size }.
+Lọc & sắp xếp: ?filter[field]=value&sort=-created_at.
+Mã lỗi chuẩn: 400, 401, 403, 404, 409 (trùng/xung đột), 422, 500. Body lỗi: { detail, code, errors[] }.
+Upload dùng checksum để idempotent; trả 409 nếu trùng hồ sơ.
+Mọi endpoint kiểm tra RBAC theo vai trò hệ thống + phạm vi đơn vị/đề tài.
+E.2. Danh sách endpoint theo module (trích yếu)
+Auth, người dùng & nhà khoa học
+Endpoint
+Method
+Mô tả
+/auth/login, /auth/refresh, /auth/me
+POST/GET
+Đăng nhập, làm mới token, thông tin & quyền
+/users, /users/{id}/roles
+GET/POST/PUT
+Quản lý người dùng & gán vai trò
+/researchers
+GET/POST
+Hồ sơ nhà khoa học
+/researchers/{id}
+GET/PATCH
+Chi tiết, cập nhật lý lịch khoa học
+/researchers/{id}/sync-orcid
+POST
+Đồng bộ công bố từ ORCID/Scopus (chạy nền)
+/researchers/{id}/metrics
+GET
+Trắc lượng: h-index, trích dẫn, số công bố
+/research-groups
+GET/POST
+Nhóm nghiên cứu & thành viên
+/experts/suggest
+POST
+Gợi ý chuyên gia/phản biện theo chuyên môn (AI-4)
+Đợt đăng ký, đề tài & hội đồng
+Endpoint
+Method
+Mô tả
+/calls
+GET/POST
+Thông báo/đợt đăng ký nhiệm vụ (cấu hình form)
+/projects
+GET/POST
+Danh sách / tạo đề tài
+/projects/{id}
+GET/PATCH
+Chi tiết đề tài, cập nhật trạng thái
+/projects/{id}/proposal
+GET/PUT
+Thuyết minh & phiên bản
+/projects/{id}/proposal/check-similarity
+POST
+AI kiểm tra trùng lặp thuyết minh (AI-3)
+/projects/{id}/proposal/ai-review
+POST
+AI rà soát tính khả thi/ngân sách (AI-10)
+/projects/{id}/milestones
+GET/POST/PATCH
+Mốc tiến độ & trạng thái
+/projects/{id}/reports
+GET/POST
+Báo cáo định kỳ/tổng kết
+/councils
+GET/POST
+Hội đồng (tuyển chọn/xét duyệt/nghiệm thu)
+/councils/{id}/assignments
+POST
+Phân công phản biện (kiểm tra COI)
+/review-assignments/{id}/scores
+POST
+Nộp điểm & nhận xét trực tuyến
+/projects/{id}/acceptance
+POST
+Kết luận nghiệm thu, xếp loại
+Kinh phí, công bố, SHTT & KPI
+Endpoint
+Method
+Mô tả
+/projects/{id}/contract
+GET/POST
+Hợp đồng & dự toán
+/projects/{id}/budget
+GET/PUT
+Dự toán & mục chi
+/projects/{id}/disbursements
+GET/POST
+Giải ngân theo đợt
+/projects/{id}/settlement
+POST
+Thanh quyết toán
+/publications
+GET/POST
+Khai báo công bố
+/publications/import-by-doi
+POST
+Nhập metadata từ DOI (AI-2/AI-14)
+/publications/{id}/verify
+POST
+Đối chiếu Crossref/OpenAlex/Scopus
+/publications/{id}/score
+POST
+Tính điểm công trình (AI-16)
+/ip-assets
+GET/POST
+Tài sản SHTT
+/kpis
+GET
+Thống kê KPI theo cá nhân/đơn vị/trường
+/awards, /collaborations, /conferences
+GET/POST
+Khen thưởng, hợp tác, hội thảo
+Báo cáo, AI & chatbot
+Endpoint
+Method
+Mô tả
+/reports/statistics
+GET
+Thống kê KH&CN (dashboard data)
+/reports/{type}/export
+POST
+Xuất Word/PDF/Excel
+/ai/documents/{id}/summarize
+POST
+Tóm tắt tài liệu (AI-1)
+/ai/documents/upload
+POST
+Upload + khởi tạo pipeline trích xuất/embedding
+/ai/projects/{id}/risk
+GET
+Cảnh báo tiến độ/rủi ro đề tài (AI-11)
+/ai/reports/draft
+POST
+Dự thảo báo cáo thống kê KH&CN (AI-13)
+/ai/leadership-brief
+GET
+Auto-brief cho lãnh đạo (AI-17)
+/ai/chat/sessions
+POST
+Tạo phiên chat RAG (gắn scope)
+/ai/chat/sessions/{id}/messages
+POST
+Gửi câu hỏi; trả lời kèm nguồn trích dẫn
+Ví dụ payload — nhập công bố theo DOI
+POST /api/v1/publications/import-by-doi
+{ "doi": "10.1016/j.xxxx.2025.01.002", "researcher_id": "rs_..." }
+ 
+Response 200:
+{
+  "title": "…",
+  "journal": { "name": "…", "issn": "…", "quartile": "Q1", "impact_factor": 6.2 },
+  "year": 2025,
+  "authors": [ { "name": "…", "matched_researcher_id": "rs_…", "order": 1 } ],
+  "citation_count": 12,
+  "source": "crossref+openalex",
+  "verified": true,
+  "suggested_work_score": 1.0        // gợi ý điểm công trình, chờ duyệt
+}
+
+F. Đặc tả tính năng AI (AI Features Specification)
+F.1. Quan điểm & nguyên tắc tích hợp AI
+AI là trợ lý chuyên môn cho công tác quản lý khoa học — hỗ trợ trích xuất, phân tích, gợi ý, cảnh báo và tự động hóa tác vụ lặp lại. AI KHÔNG thay thế hội đồng khoa học, phản biện hay cán bộ quản lý trong các quyết định chuyên môn.
+Hỗ trợ ra quyết định, không tự động quyết định thay con người (đặc biệt trong xét chọn, nghiệm thu).
+Gợi ý dựa trên dữ liệu thực — không trả lời chung chung, không bịa số liệu/trích dẫn.
+Luôn trích nguồn (DOI, hồ sơ, văn bản) khi đưa ra kết luận.
+Tuân thủ phân quyền: chỉ dùng dữ liệu trong phạm vi quyền của người dùng; bảo vệ dữ liệu cá nhân.
+Kiểm soát xung đột lợi ích khi gợi ý phản biện.
+Lưu lịch sử prompt, kết quả, người dùng kết quả và thời điểm (audit AI).
+Mọi đầu ra AI ở trạng thái “gợi ý”; người có thẩm quyền chấp nhận/sửa/từ chối.
+F.2. Bốn mức độ tích hợp AI
+Mức
+Vai trò
+Ví dụ chức năng
+Mức 1
+Hỗ trợ thao tác văn bản & dữ liệu
+Tóm tắt thuyết minh/báo cáo, trích xuất metadata bài báo, sinh mô tả
+Mức 2
+Phân tích & rà soát
+Phát hiện trùng lặp thuyết minh, rà soát ngân sách/khả thi, đối chiếu công bố
+Mức 3
+Ra khuyến nghị
+Gợi ý phản biện theo chuyên môn, gợi ý nguồn tài trợ, gợi ý hợp tác
+Mức 4
+Trợ lý quản trị KH&CN
+Cảnh báo rủi ro đề tài, dự thảo báo cáo thống kê, auto-brief lãnh đạo, hỏi đáp toàn kho
+F.3. Danh mục tính năng AI & ưu tiên triển khai
+#
+Tính năng AI
+Mô tả ngắn
+Cấp
+AI-1
+Tóm tắt tài liệu
+Tóm tắt thuyết minh, báo cáo, hợp đồng, bài báo
+1
+AI-2
+Trích xuất metadata công bố
+Bóc tách tiêu đề, tác giả, tạp chí, DOI từ file/DOI
+1
+AI-3
+Phát hiện trùng lặp thuyết minh
+So khớp ngữ nghĩa thuyết minh mới với kho đề tài đã có
+1-2
+AI-4
+Gợi ý phản biện/hội đồng
+Đối sánh chuyên môn (embedding), loại trừ xung đột lợi ích
+2
+AI-5
+Phân loại lĩnh vực nghiên cứu
+Gán mã lĩnh vực KH&CN chuẩn cho đề tài/công bố
+1-2
+AI-6
+Gợi ý nguồn tài trợ
+Khớp hồ sơ nhà khoa học với call/quỹ tài trợ phù hợp
+3
+AI-7
+Chatbot RAG nội bộ
+Hỏi đáp trên kho dữ liệu KH&CN theo phân quyền, trích nguồn
+1-3
+AI-8
+Trắc lượng khoa học
+Tính h-index, trích dẫn, mạng đồng tác giả, xu hướng
+2
+AI-9
+Kiểm tra liêm chính
+Phát hiện đạo văn/tự đạo văn, cảnh báo tạp chí 'săn mồi'
+3
+AI-10
+Rà soát thuyết minh
+Đánh giá tính khả thi, mục tiêu đo lường được, hợp lý ngân sách
+2
+AI-11
+Cảnh báo tiến độ/rủi ro đề tài
+Phát hiện mốc quá hạn, sản phẩm chậm, nguy cơ không nghiệm thu
+2-3
+AI-12
+Phát hiện bất thường ngân sách
+Cảnh báo mục chi/giải ngân bất thường so với dự toán
+3
+AI-13
+Dự thảo báo cáo thống kê
+Sinh nháp báo cáo KH&CN từ dữ liệu thực, đánh dấu phần thiếu
+3
+AI-14
+Đối chiếu công bố CSDL ngoài
+Xác thực qua Crossref/OpenAlex/Scopus, tự điền IF/quartile
+2
+AI-15
+Đề xuất hợp tác
+Gợi ý đối tác/nhóm NC từ mạng đồng tác giả & chủ đề
+4
+AI-16
+Tính điểm công trình
+Quy đổi điểm theo công thức trường, chia điểm đồng tác giả
+2-3
+AI-17
+Auto-brief cho lãnh đạo
+Bản tin định kỳ: KPI, đề tài rủi ro, công bố mới, việc cần làm
+3
+AI-18
+Dự báo khả năng đạt KPI
+Ước lượng khả năng đạt chỉ tiêu KH&CN theo đơn vị/năm
+4
+10 tính năng AI giá trị cao nhất (ưu tiên): AI-1, AI-2, AI-3, AI-4, AI-7, AI-10, AI-11, AI-13, AI-14, AI-16. Nhóm này vừa giảm việc thủ công, vừa tăng chất lượng xét chọn/nghiệm thu, vừa hỗ trợ ra quyết định và báo cáo.
+F.4. Kiến trúc AI: Rule engine + LLM hybrid
+Không dùng LLM cho mọi việc. Việc có quy tắc rõ ràng dùng rule engine; việc cần hiểu ngữ nghĩa mới dùng LLM. Quyết định chính thức luôn cần con người.
+Dùng Rule engine (deterministic)
+Dùng LLM (semantic)
+Mốc tiến độ quá hạn; hồ sơ thiếu trường
+Thuyết minh có trùng ý tưởng với đề tài cũ không
+Giải ngân vượt dự toán mục chi
+Mục tiêu nghiên cứu có đo lường được không
+Xung đột lợi ích cùng đơn vị/đồng tác giả
+Phản biện nào khớp chuyên môn nhất
+Công bố khai trùng (cùng DOI)
+Ngân sách có hợp lý với nội dung không
+Thiếu điều kiện đăng ký (chủ nhiệm nợ đề tài)
+Phản hồi/kết luận hội đồng nêu vấn đề gì
+Rule engine (điều kiện/định mức)  +  LLM (phân tích ngữ nghĩa)  +  Human approval (quyết định)
+F.5. RAG & pipeline phát hiện trùng lặp
+Tài liệu/đề tài/công bố upload
+  → Trích xuất text & metadata (PyMuPDF/GROBID/python-docx, OCR nếu scan)
+  → Chuẩn hóa, gắn lĩnh vực & ngôn ngữ
+  → Chia nhỏ thành chunks → tạo embedding (đa ngôn ngữ) → lưu pgvector
+  ┌─────────────────────────────┬──────────────────────────────────────┐
+  │  RAG hỏi đáp                │  Phát hiện trùng lặp (AI-3/AI-9)      │
+  │  - lọc theo phân quyền      │  - so khớp vector thuyết minh mới     │
+  │  - truy hồi top-k chunk     │    với kho đề tài/công bố đã có       │
+  │  - LLM trả lời + trích nguồn│  - chấm similarity_score + đoạn khớp  │
+  └─────────────────────────────┴──────────────────────────────────────┘
+Ràng buộc: Chatbot chỉ trả lời dựa trên dữ liệu được phân quyền cho người dùng; nếu không tìm thấy nguồn nội bộ, AI nói “chưa tìm thấy dữ liệu” thay vì bịa. Cảnh báo trùng lặp là gợi ý — hội đồng/cán bộ quyết định cuối cùng.
+F.6. Prompt mẫu (templates)
+Prompt lưu trong app/ai/prompts/ dưới dạng template có biến. System prompt cố định nguyên tắc; user prompt chèn dữ liệu thực; đầu ra JSON, lý do tiếng Việt.
+AI-4 — Gợi ý phản biện theo chuyên môn
+SYSTEM:
+You suggest qualified reviewers for a research proposal. You only suggest; a
+human confirms. Exclude anyone with a conflict of interest (same unit, co-author,
+listed COI). Output strict JSON. Reasons in Vietnamese.
+ 
+USER:
+Proposal title + abstract: {{proposal_summary}}
+Field/keywords: {{field_keywords}}
+Candidate experts (id, expertise keywords, recent topics, unit):
+{{candidate_experts}}
+COI constraints (ids to exclude): {{coi_ids}}
+ 
+Return JSON:
+{ "suggestions": [ { "researcher_id", "match_score", "reason" } ] }   // top 5
+AI-10 — Rà soát thuyết minh đề tài
+SYSTEM:
+You review a research proposal for feasibility, measurable objectives, and
+budget reasonableness. Be constructive. Do NOT judge scientific merit (that is
+the council's role). Output JSON. Comments in Vietnamese.
+ 
+USER:
+Proposal content: {{proposal_text}}
+Requested budget breakdown: {{budget_items}}
+Duration: {{duration}}
+ 
+Return JSON:
+{
+  "objectives_measurable": true|false,
+  "feasibility_flags": ["..."],
+  "budget_concerns": ["..."],
+  "missing_sections": ["..."],
+  "summary": "nhận xét tổng quan (tiếng Việt)"
+}
+AI-3 — Phát hiện trùng lặp (đầu ra mẫu)
+Thuyết minh "{{title}}" có độ tương đồng cao với:
+- [{{project_code_1}}] {{title_1}} — similarity {{score_1}}%
+- [{{project_code_2}}] {{title_2}} — similarity {{score_2}}%
+Đoạn trùng tiêu biểu: "{{matched_excerpt}}"
+Khuyến nghị: chuyển hội đồng xem xét khả năng trùng lặp.  (Đây là gợi ý của AI)
+AI-13 — Dự thảo báo cáo thống kê KH&CN
+SYSTEM:
+You draft a science & technology statistics report from the provided data ONLY.
+Do NOT fabricate numbers. Mark gaps as [Cần bổ sung số liệu]. Output in Vietnamese.
+ 
+USER:
+Period: {{period}}
+Data tables: {{stats_json}}   // số đề tài, kinh phí, công bố theo loại, KPI...
+ 
+Produce sections:
+1. Tổng quan hoạt động KH&CN
+2. Đề tài/dự án (theo cấp, trạng thái)
+3. Công bố khoa học (ISI/Scopus/trong nước)
+4. Kinh phí & giải ngân
+5. Nhận định & kiến nghị
+F.7. Cơ chế kiểm soát AI (AI Governance)
+Mọi nội dung AI gắn nhãn “bản gợi ý”; không mặc định là kết luận chính thức.
+AI không quyết định xét chọn/nghiệm thu; không tự tính khen thưởng khi chưa duyệt.
+Gợi ý phản biện phải qua kiểm tra xung đột lợi ích trước khi phân công.
+Đề xuất quan trọng gắn nguồn dữ liệu (DOI, hồ sơ, văn bản) liên quan.
+Lưu lịch sử prompt, kết quả AI, người phê duyệt (ai_prompts, ai_analysis_results, audit_logs).
+AI chỉ truy cập dữ liệu theo phân quyền; bảo vệ dữ liệu cá nhân nhà khoa học.
+Cảnh báo độ tin cậy khi dữ liệu thiếu hoặc đối chiếu CSDL ngoài chưa khớp.
+Tham chiếu khung quản trị rủi ro AI (NIST AI RMF): minh bạch, kiểm soát, giải trình được.
+
+G. Danh sách màn hình (UI Screens)
+Web responsive. Layout: thanh điều hướng trái theo module, header có chọn năm/đợt + tài khoản, vùng nội dung chính. Dùng shadcn/ui cho bảng, form động (dynamic form), dialog, tab, card. Mỗi màn hình tôn trọng RBAC.
+#
+Màn hình
+Nội dung chính
+S1
+Đăng nhập (SSO)
+Đăng nhập, quên mật khẩu
+S2
+Dashboard KH&CN
+KPI tổng quan, đề tài theo trạng thái, công bố, kinh phí, cảnh báo rủi ro
+S3
+Người dùng & vai trò
+Bảng người dùng, gán vai trò & phạm vi
+S4
+Tổ chức (khoa/viện/nhóm NC)
+Cây đơn vị & nhóm nghiên cứu, CRUD
+S5
+Hồ sơ nhà khoa học
+Lý lịch KH, chuyên môn, ORCID/Scopus, công bố, h-index
+S6
+Tìm chuyên gia
+Tìm theo lĩnh vực/từ khóa; gợi ý phản biện (AI)
+S7
+Thông báo & đợt đăng ký
+Tạo call, cấu hình biểu mẫu, hạn nộp
+S8
+Đăng ký/Nộp thuyết minh
+Form động theo call, đính kèm, nộp & xem phiên bản
+S9
+Danh sách đề tài
+Bảng đề tài, lọc theo cấp/đơn vị/trạng thái/năm
+S10
+Chi tiết đề tài
+Tab: thuyết minh, thành viên, mốc, kinh phí, sản phẩm, nghiệm thu
+S11
+Hội đồng & chấm điểm
+Lập hội đồng, phân công phản biện (COI), phiếu chấm trực tuyến
+S12
+Kinh phí & hợp đồng
+Hợp đồng, dự toán, giải ngân, quyết toán
+S13
+Công bố khoa học
+Khai báo/nhập DOI, đối chiếu CSDL, tính điểm công trình
+S14
+Sở hữu trí tuệ
+Sáng chế/GPHI/bản quyền, trạng thái đăng ký
+S15
+Hội thảo & hợp tác
+Hội nghị, đối tác, biên bản, chuyển giao công nghệ
+S16
+NCKH sinh viên
+Đăng ký, hướng dẫn, nghiệm thu, giải thưởng
+S17
+Khen thưởng & KPI
+Quy đổi điểm, khen thưởng, KPI theo cá nhân/đơn vị
+S18
+Liêm chính học thuật
+Kết quả kiểm tra trùng lặp/đạo văn, đạo đức NC
+S19
+Chatbot KH&CN
+Hỏi đáp RAG, hiển thị nguồn trích dẫn
+S20
+Trung tâm báo cáo & thống kê
+Báo cáo KH&CN, trắc lượng, xuất Word/PDF/Excel
+S21
+Audit log
+Nhật ký thao tác, lọc theo người/đối tượng/thời gian
+S22
+Cài đặt hệ thống
+Cấu hình quy trình, công thức điểm, tích hợp, khóa AI, sao lưu
+
+H. Hệ thống báo cáo & thống kê (Reports)
+Báo cáo lấy dữ liệu trực tiếp từ các phân hệ; xuất được Word/PDF/Excel hoặc xem dashboard. Mỗi báo cáo có đơn vị đầu mối kiểm tra. AI chỉ hỗ trợ tổng hợp/nháp; con người kiểm tra & phê duyệt.
+H.1. Nhóm báo cáo chính
+Báo cáo
+AI hỗ trợ
+Đơn vị đầu mối
+Tổng quan hoạt động KH&CN
+Tóm tắt số liệu, nhận định xu hướng
+Phòng QLKH
+Danh mục & tiến độ đề tài
+Cảnh báo đề tài chậm/rủi ro
+Phòng QLKH
+Thống kê công bố khoa học
+Đối chiếu CSDL, phân loại Q1–Q4, tính điểm
+Phòng QLKH
+Trắc lượng khoa học (bibliometrics)
+h-index, trích dẫn, mạng đồng tác giả
+Phòng QLKH
+Kinh phí & giải ngân KH&CN
+Phát hiện bất thường ngân sách
+Tài chính – Kế toán
+Kết quả hội đồng (xét chọn/nghiệm thu)
+Tổng hợp điểm, biên bản
+Phòng QLKH
+KPI nghiên cứu theo đơn vị/cá nhân
+Dự báo khả năng đạt KPI
+Phòng QLKH + Lãnh đạo
+Sở hữu trí tuệ & chuyển giao CN
+Tổng hợp trạng thái đăng ký, giá trị
+Phòng QLKH + Hợp tác
+Báo cáo gửi cấp trên (Bộ)
+Dự thảo theo biểu mẫu quy định
+Phòng QLKH
+Auto-brief lãnh đạo (định kỳ)
+Bản tin tự động KPI/rủi ro/việc cần làm
+Phòng QLKH
+H.2. Quy trình tạo báo cáo có AI (7 bước)
+Thu thập dữ liệu đầu vào từ các phân hệ liên quan.
+AI tóm tắt dữ liệu theo nhóm (đề tài, công bố, kinh phí, KPI...).
+AI gợi ý cấu trúc báo cáo theo mẫu/biểu mẫu quy định.
+AI tạo bản nháp dựa trên dữ liệu thật; phần thiếu đánh dấu [Cần bổ sung số liệu]/[Cần xác nhận].
+AI kiểm tra tính nhất quán: số liệu khớp giữa các bảng, không trùng đếm công bố.
+AI gợi ý nhận định & kiến nghị dựa trên xu hướng dữ liệu.
+Xuất báo cáo (Word/PDF/Excel/dashboard) → chuyển trạng thái chờ kiểm tra/phê duyệt.
+H.3. Quy trình kiểm tra & phê duyệt
+Tạo nháp → AI rà soát → Cán bộ phụ trách chỉnh sửa → Phòng QLKH kiểm tra
+→ Lãnh đạo phê duyệt → Khóa phiên bản chính thức (xuất gửi cấp trên)
+
+I. Triển khai trên Google Cloud (Deployment & DevOps)
+I.1. Môi trường phát triển (local, Docker-first)
+Toàn bộ MVP chạy được trên máy local bằng Docker Compose, không phụ thuộc Google Cloud. Đây là môi trường Claude Code dùng để build & test.
+# infra/docker-compose.yml  (dịch vụ)
+services:
+  db:        postgres:16  (+ pgvector)   port 5432
+  redis:     redis:7                      port 6379
+  minio:     minio (S3-compatible)        port 9000/9001
+  api:       build apps/api  (FastAPI)    port 8000
+  worker:    build apps/api  (Celery worker)
+  web:       build apps/web  (Next.js)    port 3000
+ 
+# Khởi động
+docker compose up --build
+docker compose exec api alembic upgrade head
+docker compose exec api python -m app.db.seed   # seed loại nhiệm vụ, đơn vị, demo
+Biến môi trường (.env): DATABASE_URL, REDIS_URL, STORAGE_BACKEND (minio|gcs), GCS_BUCKET, ANTHROPIC_API_KEY, EMBEDDING_PROVIDER, CROSSREF_MAILTO, OPENALEX_KEY, SCOPUS_API_KEY, ORCID_CLIENT_ID/SECRET, JWT_SECRET. Dev dùng .env; prod dùng Secret Manager.
+I.2. Môi trường production (Google Cloud)
+Thành phần
+Dịch vụ Google Cloud
+Chạy backend & frontend
+Cloud Run (serverless container, scale theo request, scale-to-zero)
+Cơ sở dữ liệu
+Cloud SQL for PostgreSQL 16 (+ pgvector); bật backup tự động & PITR
+Lưu file hồ sơ KH&CN
+Cloud Storage (signed URL cho file nhạy cảm); Object Versioning
+Kết nối DB an toàn
+Cloud SQL Auth Proxy / Serverless VPC Connector
+Xử lý nền
+Cloud Run Jobs + Cloud Tasks (trích xuất, embedding, đối chiếu CSDL, kiểm tra trùng)
+Lịch chạy định kỳ
+Cloud Scheduler (đồng bộ Scopus/ORCID, auto-brief, nhắc tiến độ)
+Bí mật
+Secret Manager (API key Claude/Scopus/ORCID, mật khẩu DB, JWT secret)
+Ảnh container
+Artifact Registry
+AI
+Claude API (hoặc Claude trên Vertex AI); Document AI cho OCR
+Xác thực (tùy chọn)
+Google Identity Platform / Firebase Auth (SSO trường, MFA)
+Quan sát
+Cloud Logging + Error Reporting + Cloud Monitoring (alerting)
+I.3. CI/CD (GitHub Actions → Cloud Run)
+GitHub repo (nhánh)
+  ├── feature/*  → CI: lint + test (pytest, vitest)
+  ├── dev        → deploy môi trường dev
+  ├── staging    → deploy môi trường thử nghiệm
+  └── main       → deploy production (cần review + approve)
+ 
+Luồng deploy:
+  push → GitHub Actions → build Docker → Artifact Registry
+       → deploy Cloud Run (api, web, worker)
+       → kết nối Cloud SQL + Cloud Storage + Secret Manager
+       → chạy alembic migrate (Cloud Run Job)
+Nguyên tắc an toàn: KHÔNG để Claude Code tự push thẳng vào main hay tự deploy production. Claude Code hỗ trợ viết code/test/migration/PR; quyết định merge & deploy do con người kiểm soát. Dùng nhánh và Pull Request.
+I.4. Những điều KHÔNG nên làm
+Không lưu file gốc (PDF/DOCX) trong DB — dùng Cloud Storage; DB chỉ giữ metadata + vector.
+Không build monolith quá lớn — bắt đầu modular monolith, tách worker AI/đối chiếu CSDL khi cần.
+Không để AI tự quyết định xét chọn/nghiệm thu/khen thưởng.
+Không gọi CSDL ngoài (Scopus/Crossref) đồng bộ trong request — luôn chạy nền & cache.
+Không bỏ qua kiểm soát xung đột lợi ích khi phân công phản biện.
+Không đưa dữ liệu cá nhân/nhạy cảm vào AI khi chưa có chính sách bảo mật, phân quyền & audit.
+
+J. Lộ trình & hướng dẫn cho Claude Code
+J.1. Lộ trình 6 giai đoạn
+Giai đoạn
+Tên
+Thời lượng
+Kết quả chính
+GĐ 0
+Chuẩn hóa yêu cầu
+1–2 tuần
+Bộ tài liệu docs/ (PRD, schema, API, AI, UI, report, deploy)
+GĐ 1
+Nền tảng lõi
+4–6 tuần
+Auth/SSO, RBAC, tổ chức, hồ sơ nhà khoa học, dashboard sơ bộ, audit log
+GĐ 2
+Đề tài & hội đồng
+5–7 tuần
+Đợt đăng ký, thuyết minh, vòng đời đề tài, hội đồng & chấm điểm, kinh phí cơ bản
+GĐ 3
+Công bố, báo cáo & AI cơ bản
+5–7 tuần
+Công bố + đối chiếu CSDL, tính điểm, AI tóm tắt/trích xuất/trùng lặp, chatbot, báo cáo → MVP
+GĐ 4
+AI nâng cao & mở rộng
+8–12 tuần
+Gợi ý phản biện, trắc lượng, cảnh báo rủi ro, SHTT, hợp tác, NCKH SV, KPI, dự báo
+GĐ 5
+Pilot & triển khai Cloud
+4–8 tuần
+Pilot 1 đợt thật, deploy Google Cloud, đào tạo, mở rộng toàn trường
+Nếu trình bày với lãnh đạo, gộp thành 3 giai đoạn lớn: (1) Hệ thống lõi & quản lý đề tài; (2) Tích hợp AI & quản trị KH&CN bằng dữ liệu; (3) Thí điểm, triển khai Google Cloud & nhân rộng.
+J.2. Phạm vi MVP (10 module bắt buộc)
+Đăng nhập & phân quyền RBAC.
+Hồ sơ nhà khoa học (cơ bản + ORCID).
+Thông báo & đăng ký nhiệm vụ KH&CN (form động).
+Quản lý đề tài/dự án (vòng đời cơ bản).
+Hội đồng khoa học & chấm điểm trực tuyến.
+Kinh phí & hợp đồng (cơ bản).
+Công bố khoa học + đối chiếu DOI + tính điểm.
+AI tóm tắt tài liệu & kiểm tra trùng lặp thuyết minh.
+Báo cáo thống kê KH&CN + dashboard.
+Audit log & quy trình phê duyệt.
+Để giai đoạn 4: gợi ý phản biện AI nâng cao, trắc lượng đầy đủ, cảnh báo rủi ro/ngân sách, SHTT, hội thảo, NCKH sinh viên, hợp tác & chuyển giao, KPI & dự báo, liêm chính học thuật nâng cao.
+J.3. Phân rã thành Epic (giao việc cho Claude Code)
+KHÔNG giao một yêu cầu quá rộng. Giao theo từng epic, mỗi epic build–test–PR rồi mới sang epic sau.
+Epic
+Tên
+Phạm vi
+E1
+Project Setup
+Monorepo, Docker Compose, Cloud SQL/Postgres+pgvector, FastAPI & Next.js skeleton, CI
+E2
+Auth & Authorization
+JWT/SSO, users/roles/permissions, RBAC middleware, user_scopes
+E3
+Researchers & Org
+researchers, expertise, research_groups, ORCID sync, đơn vị
+E4
+Calls & Proposals
+calls (form động), proposals, proposal_versions, nộp trực tuyến
+E5
+Projects & Lifecycle
+projects, milestones, members, products, reports, state machine
+E6
+Councils & Review
+councils, assignments, COI, review_forms, chấm điểm trực tuyến
+E7
+Funding & Contracts
+contracts, budgets, disbursements, settlements
+E8
+Publications & Scoring
+publications, integrations (Crossref/OpenAlex), work_scores
+E9
+AI & RAG
+document pipeline, embeddings, AI-1/2/3/4/10, chatbot RAG
+E10
+Reporting & Dashboard
+thống kê KH&CN, KPI, export Word/PDF/Excel, auto-brief
+E11
+Deployment (Google Cloud)
+Dockerfiles, cloudbuild.yaml, GitHub Actions, Cloud Run + Cloud SQL + GCS
+J.4. Sáu quyết định cần chốt trước khi build
+Quyết định
+Lựa chọn đề xuất (mặc định)
+Nguồn trắc lượng
+Bắt đầu Crossref + OpenAlex (miễn phí/mở); thêm Scopus khi có license
+Backend framework
+FastAPI (Python) — thuận lợi cho xử lý tài liệu, trắc lượng & AI
+Frontend framework
+Next.js + TypeScript + Tailwind + shadcn/ui
+Nhà cung cấp LLM
+Claude API (đổi được sang Vertex AI qua interface LLMProvider)
+Embedding & vector store
+pgvector + model đa ngôn ngữ (MVP); nâng cấp Vertex AI Vector Search khi dữ liệu lớn
+Xác thực
+JWT cho MVP; tích hợp SSO trường (Google Identity Platform) ở GĐ5
+J.5. Prompt khởi đầu cho Claude Code
+You are building AISRM1 (AI-ResearchHub), an AI-integrated Scientific Research
+Management System for a university Research Management Office. The full
+specification is in docs/ (read it first: database schema, API spec, AI features,
+deployment). Target: run on Google Cloud (Cloud Run + Cloud SQL + Cloud Storage).
+ 
+Build an MVP web application with this stack:
+- Frontend: Next.js 14 (App Router) + TypeScript + Tailwind + shadcn/ui
+- Backend: FastAPI (Python 3.11) + SQLAlchemy 2.0 + Alembic + Pydantic v2
+- Database: PostgreSQL 16 + pgvector (Cloud SQL in prod)
+- File storage: abstraction (MinIO for dev, Google Cloud Storage for prod)
+- Background jobs: Celery + Redis (dev) / Cloud Run Jobs + Cloud Tasks (prod)
+- AI provider: Claude API (behind an LLMProvider interface)
+- Bibliometrics: Crossref + OpenAlex (behind a BibliometricProvider interface)
+- Local dev: Docker Compose; Deployment target: Google Cloud Run
+ 
+Core MVP modules (build incrementally, one epic at a time, with tests):
+1. Auth + role-based access control (system roles + unit/project scope)
+2. Researcher profiles (+ ORCID sync) and organization
+3. Calls for proposals (dynamic forms) and proposal submission
+4. Project lifecycle management (state machine)
+5. Scientific councils and online review/scoring (with conflict-of-interest)
+6. Funding, contracts and disbursements (basic)
+7. Publications + DOI verification (Crossref/OpenAlex) + work scoring
+8. AI document summarization + proposal similarity detection (RAG pipeline)
+9. S&T statistics reporting and dashboard
+10. Audit log + approval workflow
+ 
+Rules:
+- Human-in-the-loop: all AI output is a SUGGESTION, never auto-approved. AI must
+  NOT decide proposal selection, acceptance, or rewards.
+- AI must cite sources (DOI, records, documents) and must NOT fabricate data.
+- Enforce conflict-of-interest checks before assigning reviewers.
+- Respect RBAC everywhere, including AI/RAG retrieval scope and personal data.
+- Do not store original files in the relational DB (use object storage).
+- Call external databases (Scopus/Crossref) only in background jobs, with caching.
+- Start with a clean modular-monolith backend; do not over-engineer.
+- Create repo structure, DB schema (Alembic migrations), backend API, frontend
+  pages, seed data, and docs.
+- Work on branches and open Pull Requests; never push to main or deploy
+  production automatically.
+ 
+Start with Epic E1 (Project Setup): scaffold the monorepo, docker-compose,
+Postgres with pgvector, FastAPI skeleton with health check, Next.js skeleton,
+and CI. Then stop and summarize before continuing to E2.
+J.6. Nội dung đề xuất cho CLAUDE.md (đặt ở gốc repo)
+# AISRM1 — AI-ResearchHub — Hướng dẫn cho Claude Code
+ 
+## Sản phẩm
+Hệ thống quản lý KH&CN tích hợp AI cho Phòng Quản lý khoa học. Spec đầy đủ ở docs/.
+Chạy trên Google Cloud (Cloud Run + Cloud SQL + Cloud Storage).
+ 
+## Stack
+Next.js+TS (apps/web), FastAPI (apps/api), PostgreSQL+pgvector, Celery+Redis,
+Storage abstraction (MinIO/GCS), Claude API, Crossref/OpenAlex/ORCID integrations.
+ 
+## Quy ước
+- Backend: SQLAlchemy 2.0, Pydantic v2, router theo module trong app/api/v1.
+- Migration: Alembic. Tích hợp ngoài đặt sau interface (integrations/).
+- AI sau interface LLMProvider; storage sau StorageService; trắc lượng sau
+  BibliometricProvider.
+- Test: pytest (api), vitest (web). Mọi PR phải pass test.
+- Bảng số nhiều, snake_case; id UUID; created_at/updated_at.
+ 
+## Nguyên tắc bắt buộc
+- Human-in-the-loop: AI chỉ gợi ý, con người phê duyệt. AI không quyết định
+  xét chọn/nghiệm thu/khen thưởng.
+- AI không bịa số liệu; luôn trích nguồn. Kiểm tra xung đột lợi ích khi gợi ý
+  phản biện. Tuân thủ RBAC & bảo vệ dữ liệu cá nhân.
+- Không lưu file gốc trong DB. Gọi CSDL ngoài chỉ trong job nền + cache.
+- Không tự deploy production.
+ 
+## Quy trình
+Làm theo Epic (E1..E11). Mỗi epic: code + test + mở PR + tóm tắt, rồi dừng
+chờ review trước khi sang epic kế tiếp.
+ 
+## Lệnh thường dùng
+- docker compose up --build
+- alembic upgrade head
+- pytest ; npm run test
+J.7. Kết luận
+Tài liệu này đủ để Claude Code bắt đầu xây dựng AISRM1 – AI-ResearchHub bản MVP và phát triển theo lộ trình tới nền tảng quản trị KH&CN cấp trường, chạy trên Google Cloud. Cách làm tốt nhất: chuẩn hóa tài liệu trong docs/ → tạo repo GitHub → dùng prompt khởi đầu dựng khung → build từng epic → test local → push GitHub qua PR → deploy Cloud Run → bổ sung AI nâng cao ở các giai đoạn sau.
+Tóm lại: Đủ để bắt đầu MVP có kiểm soát; mở rộng dần thành nền tảng “quản trị khoa học liên tục dựa trên dữ liệu và AI”, giúp Phòng Quản lý khoa học chuyển từ “quản lý hồ sơ hành chính” sang “điều hành hoạt động KH&CN thông minh, minh bạch và liêm chính”.

@@ -1,0 +1,248 @@
+"""Central enumerations (stored as strings for configurability)."""
+
+from __future__ import annotations
+
+from enum import StrEnum
+
+
+# ----- Identity / RBAC -----
+class SystemRole(StrEnum):
+    SYSTEM_ADMIN = "SYSTEM_ADMIN"
+    RESEARCH_OFFICE_ADMIN = "RESEARCH_OFFICE_ADMIN"
+    RESEARCH_OFFICER = "RESEARCH_OFFICER"
+    EXECUTIVE = "EXECUTIVE"
+    AUDITOR = "AUDITOR"
+
+
+class UnitRole(StrEnum):
+    UNIT_HEAD = "UNIT_HEAD"
+    UNIT_RESEARCH_COORDINATOR = "UNIT_RESEARCH_COORDINATOR"
+    DEPARTMENT_HEAD = "DEPARTMENT_HEAD"
+
+
+class ProfileRole(StrEnum):
+    PI = "PI"
+    PROJECT_MEMBER = "PROJECT_MEMBER"
+    PROPOSAL_EDITOR = "PROPOSAL_EDITOR"
+    REVIEWER = "REVIEWER"
+    COUNCIL_CHAIR = "COUNCIL_CHAIR"
+    COUNCIL_SECRETARY = "COUNCIL_SECRETARY"
+    ETHICS_REVIEWER = "ETHICS_REVIEWER"
+    FINANCE_VIEWER = "FINANCE_VIEWER"
+
+
+class UserStatus(StrEnum):
+    ACTIVE = "ACTIVE"
+    INVITED = "INVITED"
+    SUSPENDED = "SUSPENDED"
+    DISABLED = "DISABLED"
+
+
+# ----- Organization -----
+class UnitType(StrEnum):
+    UNIVERSITY = "UNIVERSITY"
+    CAMPUS = "CAMPUS"
+    FACULTY = "FACULTY"
+    INSTITUTE = "INSTITUTE"
+    DEPARTMENT = "DEPARTMENT"
+    CENTER = "CENTER"
+    OFFICE = "OFFICE"
+    RESEARCH_GROUP = "RESEARCH_GROUP"
+
+
+# ----- Documents -----
+class Classification(StrEnum):
+    PUBLIC = "PUBLIC"
+    INTERNAL = "INTERNAL"
+    CONFIDENTIAL = "CONFIDENTIAL"
+    RESTRICTED = "RESTRICTED"
+
+
+class DocumentStatus(StrEnum):
+    UPLOADING = "UPLOADING"
+    QUARANTINED = "QUARANTINED"
+    PROCESSING = "PROCESSING"
+    AVAILABLE = "AVAILABLE"
+    FAILED = "FAILED"
+    SUPERSEDED = "SUPERSEDED"
+    ARCHIVED = "ARCHIVED"
+    DELETED_PENDING = "DELETED_PENDING"
+
+
+class ScanStatus(StrEnum):
+    PENDING = "PENDING"
+    CLEAN = "CLEAN"
+    INFECTED = "INFECTED"
+    ERROR = "ERROR"
+
+
+# ----- Funding / Proposal -----
+class CallStatus(StrEnum):
+    DRAFT = "DRAFT"
+    PUBLISHED = "PUBLISHED"
+    OPEN = "OPEN"
+    CLOSED = "CLOSED"
+    ARCHIVED = "ARCHIVED"
+
+
+class ProposalStatus(StrEnum):
+    DRAFT = "DRAFT"
+    INTERNAL_REVIEW = "INTERNAL_REVIEW"
+    SUBMITTED = "SUBMITTED"
+    ADMIN_CHECK = "ADMIN_CHECK"
+    ELIGIBLE = "ELIGIBLE"
+    INELIGIBLE = "INELIGIBLE"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    COUNCIL = "COUNCIL"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    WITHDRAWN = "WITHDRAWN"
+
+
+# ----- Review / Council -----
+class ConflictType(StrEnum):
+    SAME_UNIT = "SAME_UNIT"
+    RECENT_COAUTHOR = "RECENT_COAUTHOR"
+    SUPERVISION = "SUPERVISION"
+    FINANCIAL = "FINANCIAL"
+    PERSONAL = "PERSONAL"
+    OTHER = "OTHER"
+
+
+class ConflictDecision(StrEnum):
+    NONE = "NONE"
+    DECLARED = "DECLARED"
+    BLOCKED = "BLOCKED"
+    CLEARED = "CLEARED"
+
+
+class AssignmentStatus(StrEnum):
+    INVITED = "INVITED"
+    ACCEPTED = "ACCEPTED"
+    DECLINED = "DECLINED"
+    SUBMITTED = "SUBMITTED"
+    REPLACED = "REPLACED"
+    EXPIRED = "EXPIRED"
+
+
+class Recommendation(StrEnum):
+    ACCEPT = "ACCEPT"
+    MINOR_REVISION = "MINOR_REVISION"
+    MAJOR_REVISION = "MAJOR_REVISION"
+    REJECT = "REJECT"
+
+
+class DecisionOutcome(StrEnum):
+    APPROVED = "APPROVED"
+    APPROVED_WITH_CONDITIONS = "APPROVED_WITH_CONDITIONS"
+    REJECTED = "REJECTED"
+    DEFERRED = "DEFERRED"
+
+
+# ----- Project -----
+class ProjectStatus(StrEnum):
+    PENDING_ACTIVATION = "PENDING_ACTIVATION"
+    ACTIVE = "ACTIVE"
+    SUSPENDED = "SUSPENDED"
+    CHANGE_PENDING = "CHANGE_PENDING"
+    CLOSING = "CLOSING"
+    UNDER_ACCEPTANCE = "UNDER_ACCEPTANCE"
+    COMPLETED = "COMPLETED"
+    TERMINATED = "TERMINATED"
+
+
+class TaskStatus(StrEnum):
+    TODO = "TODO"
+    IN_PROGRESS = "IN_PROGRESS"
+    BLOCKED = "BLOCKED"
+    DONE = "DONE"
+    CANCELLED = "CANCELLED"
+
+
+class ReportStatus(StrEnum):
+    DRAFT = "DRAFT"
+    SUBMITTED = "SUBMITTED"
+    UNDER_CHECK = "UNDER_CHECK"
+    REVISION_REQUESTED = "REVISION_REQUESTED"
+    ACCEPTED = "ACCEPTED"
+
+
+class DeliverableStatus(StrEnum):
+    PLANNED = "PLANNED"
+    IN_PROGRESS = "IN_PROGRESS"
+    SUBMITTED = "SUBMITTED"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    REVISION_REQUESTED = "REVISION_REQUESTED"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+
+
+class ChangeStatus(StrEnum):
+    DRAFT = "DRAFT"
+    SUBMITTED = "SUBMITTED"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+
+
+class RiskStatus(StrEnum):
+    OPEN = "OPEN"
+    MITIGATING = "MITIGATING"
+    CLOSED = "CLOSED"
+
+
+# ----- Outputs -----
+class OutputStatus(StrEnum):
+    DRAFT = "DRAFT"
+    IMPORTED = "IMPORTED"
+    CLAIMED = "CLAIMED"
+    UNDER_VERIFICATION = "UNDER_VERIFICATION"
+    VERIFIED = "VERIFIED"
+    PUBLISHED = "PUBLISHED"
+    ARCHIVED = "ARCHIVED"
+
+
+class VerificationStatus(StrEnum):
+    UNVERIFIED = "UNVERIFIED"
+    IN_REVIEW = "IN_REVIEW"
+    VERIFIED = "VERIFIED"
+    REJECTED = "REJECTED"
+
+
+# ----- Workflow -----
+class WorkflowTaskStatus(StrEnum):
+    OPEN = "OPEN"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
+    ESCALATED = "ESCALATED"
+
+
+class ApprovalDecision(StrEnum):
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    DELEGATED = "DELEGATED"
+
+
+class NotificationStatus(StrEnum):
+    UNREAD = "UNREAD"
+    READ = "READ"
+    ARCHIVED = "ARCHIVED"
+
+
+# ----- AI -----
+class AIJobStatus(StrEnum):
+    QUEUED = "QUEUED"
+    RUNNING = "RUNNING"
+    SUCCEEDED = "SUCCEEDED"
+    PARTIAL = "PARTIAL"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
+
+class AIOutputStatus(StrEnum):
+    DRAFT = "DRAFT"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    STALE = "STALE"

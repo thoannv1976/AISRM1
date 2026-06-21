@@ -1,0 +1,215 @@
+"""Built-in roles and their permission codes.
+
+Permission code convention: ``<module>.<action>`` (e.g. ``proposals.submit``).
+``*`` is a global wildcard; ``<module>.*`` is a module wildcard.
+"""
+
+from __future__ import annotations
+
+from app.core.enums import SystemRole
+
+# Common action sets
+_READ = "read"
+_WRITE = ["read", "create", "update"]
+
+MODULES = [
+    "organizations",
+    "units",
+    "users",
+    "researchers",
+    "funding",
+    "calls",
+    "proposals",
+    "reviews",
+    "councils",
+    "decisions",
+    "projects",
+    "finance",
+    "outputs",
+    "documents",
+    "ai",
+    "workflow",
+    "tasks",
+    "reports",
+    "dashboards",
+    "audit",
+    "admin",
+    "integrations",
+]
+
+
+def _expand(module: str, actions: list[str]) -> list[str]:
+    return [f"{module}.{a}" for a in actions]
+
+
+# Built-in role -> permission codes
+BUILTIN_ROLE_PERMISSIONS: dict[str, list[str]] = {
+    SystemRole.SYSTEM_ADMIN: ["*"],
+    SystemRole.RESEARCH_OFFICE_ADMIN: [
+        "organizations.read",
+        "units.*",
+        "users.*",
+        "researchers.*",
+        "funding.*",
+        "calls.*",
+        "proposals.*",
+        "reviews.*",
+        "councils.*",
+        "decisions.*",
+        "projects.*",
+        "finance.read",
+        "outputs.*",
+        "documents.*",
+        "ai.*",
+        "workflow.*",
+        "tasks.*",
+        "reports.*",
+        "dashboards.*",
+        "audit.read",
+        "admin.config",
+        "integrations.read",
+    ],
+    SystemRole.RESEARCH_OFFICER: [
+        "organizations.read",
+        "units.read",
+        "users.read",
+        "researchers.read",
+        "funding.read",
+        "calls.*",
+        "proposals.read",
+        "proposals.update",
+        "proposals.assign",
+        "reviews.*",
+        "councils.*",
+        "decisions.read",
+        "projects.read",
+        "projects.update",
+        "outputs.*",
+        "documents.read",
+        "documents.create",
+        "ai.run",
+        "workflow.*",
+        "tasks.*",
+        "reports.*",
+        "dashboards.read",
+    ],
+    SystemRole.EXECUTIVE: [
+        "organizations.read",
+        "units.read",
+        "researchers.read",
+        "funding.read",
+        "calls.read",
+        "proposals.read",
+        "projects.read",
+        "outputs.read",
+        "decisions.read",
+        "reports.read",
+        "dashboards.read",
+        "finance.read",
+    ],
+    SystemRole.AUDITOR: [
+        "audit.read",
+        "audit.export",
+        "reports.read",
+        "dashboards.read",
+        "proposals.read",
+        "projects.read",
+        "outputs.read",
+        "documents.read",
+        "ai.read",
+    ],
+    # Unit roles
+    "UNIT_HEAD": [
+        "units.read",
+        "researchers.read",
+        "proposals.read",
+        "proposals.approve",
+        "projects.read",
+        "outputs.read",
+        "outputs.verify",
+        "reports.read",
+        "dashboards.read",
+        "tasks.read",
+        "tasks.update",
+    ],
+    "UNIT_RESEARCH_COORDINATOR": [
+        "units.read",
+        "researchers.read",
+        "researchers.update",
+        "proposals.read",
+        "projects.read",
+        "outputs.read",
+        "outputs.verify",
+        "documents.read",
+        "reports.read",
+        "dashboards.read",
+        "tasks.*",
+    ],
+    # Profile roles
+    "PI": [
+        "researchers.read",
+        "calls.read",
+        "proposals.read",
+        "proposals.create",
+        "proposals.update",
+        "proposals.submit",
+        "projects.read",
+        "projects.update",
+        "outputs.read",
+        "outputs.create",
+        "documents.read",
+        "documents.create",
+        "ai.run",
+        "tasks.read",
+        "tasks.update",
+        "dashboards.read",
+    ],
+    "PROJECT_MEMBER": [
+        "proposals.read",
+        "projects.read",
+        "projects.update",
+        "outputs.read",
+        "outputs.create",
+        "documents.read",
+        "documents.create",
+        "tasks.read",
+        "tasks.update",
+        "ai.run",
+    ],
+    "REVIEWER": [
+        "reviews.read",
+        "reviews.update",
+        "reviews.submit",
+        "documents.read",
+        "tasks.read",
+        "tasks.update",
+    ],
+    "COUNCIL_CHAIR": [
+        "councils.read",
+        "councils.update",
+        "reviews.read",
+        "decisions.read",
+        "decisions.create",
+        "documents.read",
+        "tasks.read",
+        "tasks.update",
+    ],
+    "COUNCIL_SECRETARY": [
+        "councils.read",
+        "councils.update",
+        "reviews.read",
+        "documents.read",
+        "ai.run",
+        "tasks.read",
+        "tasks.update",
+    ],
+    "FINANCE_VIEWER": ["finance.read", "projects.read", "reports.read"],
+}
+
+
+def has_permission(granted: set[str], required: str) -> bool:
+    """Check a required permission against a set of granted codes (with wildcards)."""
+    if "*" in granted or required in granted:
+        return True
+    module = required.split(".", 1)[0]
+    return f"{module}.*" in granted

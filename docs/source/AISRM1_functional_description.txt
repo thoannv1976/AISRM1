@@ -1,0 +1,635 @@
+Dưới đây là bản mô tả có thể dùng trực tiếp làm yêu cầu đầu vào cho Claude Code để xây dựng app quản lý khoa học cho trường đại học.
+Mô tả ứng dụng: Hệ thống Quản lý Khoa học và Nghiên cứu Đại học tích hợp AI
+1. Tên ứng dụng gợi ý
+UniResearch AIHệ thống quản lý hoạt động khoa học, nghiên cứu, công bố, đề tài, hội thảo, sáng kiến và báo cáo khoa học dành cho trường đại học.
+2. Mục tiêu của ứng dụng
+Ứng dụng được xây dựng nhằm hỗ trợ trường đại học quản lý toàn diện hoạt động khoa học và công nghệ của giảng viên, nhà nghiên cứu, khoa, viện, trung tâm và phòng quản lý khoa học.
+Hệ thống giúp số hóa toàn bộ quy trình quản lý nghiên cứu, từ đăng ký đề tài, xét duyệt, theo dõi tiến độ, quản lý kinh phí, lưu trữ sản phẩm khoa học, thống kê công bố, đánh giá hiệu quả nghiên cứu, đến tự động tạo báo cáo phục vụ kiểm định, xếp hạng đại học, báo cáo Bộ Giáo dục và Đào tạo, báo cáo nội bộ và chiến lược phát triển khoa học công nghệ.
+Ứng dụng cần tích hợp AI để hỗ trợ cán bộ quản lý và giảng viên giảm thời gian nhập liệu, tự động hóa báo cáo, phân tích dữ liệu nghiên cứu, gợi ý hướng nghiên cứu, kiểm tra hồ sơ, tóm tắt tài liệu và hỗ trợ ra quyết định.
+
+3. Nhóm người dùng chính
+3.1. Quản trị hệ thống
+Có quyền quản lý toàn bộ hệ thống, tài khoản, phân quyền, cấu hình danh mục, biểu mẫu, quy trình phê duyệt và dữ liệu toàn trường.
+3.2. Phòng Quản lý Khoa học
+Quản lý đề tài, công bố, hội thảo, hồ sơ nghiên cứu, báo cáo thống kê, kinh phí, quy trình xét duyệt, đánh giá kết quả và tổng hợp dữ liệu khoa học toàn trường.
+3.3. Lãnh đạo trường
+Xem dashboard tổng hợp, báo cáo chiến lược, chỉ số nghiên cứu, năng suất khoa học theo đơn vị, lĩnh vực, cá nhân và giai đoạn.
+3.4. Lãnh đạo khoa, viện, trung tâm
+Theo dõi hoạt động nghiên cứu của đơn vị mình, phê duyệt hồ sơ cấp đơn vị, xem thống kê công bố, đề tài, hội thảo, nhóm nghiên cứu và kết quả khoa học.
+3.5. Giảng viên, nhà nghiên cứu
+Cập nhật hồ sơ khoa học cá nhân, đăng ký đề tài, khai báo công bố, nộp minh chứng, theo dõi tiến độ đề tài, tạo báo cáo cá nhân và sử dụng AI để hỗ trợ viết, kiểm tra, tóm tắt tài liệu nghiên cứu.
+3.6. Chuyên viên tài chính hoặc kế toán đề tài
+Theo dõi kinh phí, giải ngân, quyết toán, chứng từ và báo cáo tài chính liên quan đến đề tài khoa học.
+
+4. Các phân hệ chức năng chính
+4.1. Dashboard tổng quan
+Dashboard cần hiển thị các chỉ số chính của hoạt động khoa học trong trường:
+Tổng số đề tài đang thực hiện
+Tổng số đề tài đã nghiệm thu
+Tổng số công bố khoa học
+Số bài báo quốc tế
+Số bài báo trong nước
+Số sách, giáo trình, chương sách
+Số hội thảo, tọa đàm, seminar khoa học
+Số sáng chế, giải pháp hữu ích, sản phẩm chuyển giao
+Tổng kinh phí nghiên cứu
+Tỷ lệ đề tài đúng hạn, chậm hạn, cần cảnh báo
+Số công bố theo khoa, viện, trung tâm
+Số công bố theo giảng viên
+Biểu đồ xu hướng nghiên cứu theo năm
+Biểu đồ cơ cấu lĩnh vực nghiên cứu
+Bảng xếp hạng năng suất nghiên cứu theo đơn vị và cá nhân
+Dashboard cần có bộ lọc theo năm học, năm tài chính, khoa, viện, lĩnh vực nghiên cứu, loại đề tài, loại công bố và trạng thái hồ sơ.
+
+4.2. Quản lý hồ sơ khoa học cá nhân
+Mỗi giảng viên, nhà nghiên cứu có một hồ sơ khoa học cá nhân gồm:
+Thông tin cá nhân
+Học hàm, học vị
+Đơn vị công tác
+Chuyên ngành
+Lĩnh vực nghiên cứu
+Từ khóa nghiên cứu
+ORCID, Google Scholar, Scopus ID, Web of Science Researcher ID nếu có
+Danh sách công bố
+Danh sách đề tài đã tham gia
+Danh sách đề tài chủ nhiệm
+Hội thảo đã tham dự
+Hội thảo đã báo cáo
+Sách, giáo trình, chương sách
+Sáng kiến, sáng chế, giải pháp hữu ích
+Giải thưởng khoa học
+Nhóm nghiên cứu tham gia
+Minh chứng đính kèm
+CV khoa học tự động tạo từ dữ liệu trong hệ thống
+AI cần hỗ trợ tự động tạo bản tóm tắt hồ sơ khoa học cá nhân, tự động viết CV nghiên cứu, tự động tạo bio học thuật bằng tiếng Việt và tiếng Anh.
+
+4.3. Quản lý đề tài nghiên cứu khoa học
+Hệ thống cần quản lý toàn bộ vòng đời của một đề tài nghiên cứu:
+Giai đoạn đăng ký đề tài
+Tạo hồ sơ đề tài
+Nhập tên đề tài tiếng Việt và tiếng Anh
+Chọn cấp đề tài: cấp trường, cấp bộ, cấp nhà nước, hợp tác doanh nghiệp, quốc tế
+Chọn lĩnh vực nghiên cứu
+Khai báo chủ nhiệm đề tài
+Khai báo thành viên tham gia
+Nhập mục tiêu nghiên cứu
+Nhập nội dung nghiên cứu
+Nhập phương pháp nghiên cứu
+Nhập sản phẩm dự kiến
+Nhập thời gian thực hiện
+Nhập kinh phí dự kiến
+Tải lên thuyết minh đề tài
+Tải lên biểu mẫu và minh chứng
+Giai đoạn xét duyệt
+Gửi hồ sơ lên khoa
+Khoa phê duyệt hoặc yêu cầu chỉnh sửa
+Phòng Quản lý Khoa học kiểm tra hồ sơ
+Hội đồng xét duyệt đánh giá
+Ghi nhận nhận xét, điểm số, kết luận
+Phê duyệt hoặc từ chối đề tài
+Lưu lịch sử xử lý hồ sơ
+Giai đoạn thực hiện
+Theo dõi tiến độ theo mốc thời gian
+Cập nhật báo cáo định kỳ
+Tải lên sản phẩm trung gian
+Theo dõi kinh phí đã sử dụng
+Gửi yêu cầu gia hạn nếu cần
+Cảnh báo đề tài chậm tiến độ
+Giai đoạn nghiệm thu
+Nộp báo cáo tổng kết
+Nộp sản phẩm khoa học
+Tải lên minh chứng công bố
+Thành lập hội đồng nghiệm thu
+Nhập kết quả đánh giá
+Xếp loại đề tài
+Lưu biên bản nghiệm thu
+Đóng hồ sơ đề tài
+AI cần hỗ trợ kiểm tra hồ sơ đề tài, gợi ý chỉnh sửa mục tiêu, tóm tắt thuyết minh, phát hiện thiếu thông tin, gợi ý sản phẩm nghiên cứu phù hợp và tự động tạo bản nhận xét sơ bộ cho chuyên viên quản lý.
+
+4.4. Quản lý công bố khoa học
+Hệ thống cần cho phép khai báo, lưu trữ và kiểm duyệt các loại công bố:
+Bài báo quốc tế
+Bài báo trong nước
+Bài hội thảo quốc tế
+Bài hội thảo trong nước
+Sách chuyên khảo
+Giáo trình
+Chương sách
+Báo cáo nghiên cứu
+Sản phẩm nghiên cứu ứng dụng
+Sáng chế, giải pháp hữu ích
+Sản phẩm chuyển giao công nghệ
+Bài viết chính sách
+Báo cáo tư vấn cho cơ quan, doanh nghiệp
+Thông tin cần quản lý:
+Tên công bố
+Tác giả
+Vai trò tác giả
+Đơn vị công tác
+Năm công bố
+Tên tạp chí hoặc hội thảo
+ISSN/ISBN/DOI
+Chỉ mục nếu có
+Loại công bố
+Lĩnh vực nghiên cứu
+Minh chứng đính kèm
+Điểm quy đổi theo quy định của trường
+Trạng thái xác minh
+Người duyệt
+Ngày duyệt
+AI cần hỗ trợ trích xuất thông tin từ file PDF, nhận diện tiêu đề, tác giả, DOI, tạp chí, năm công bố, tóm tắt nội dung bài báo, gợi ý lĩnh vực nghiên cứu và tự động phân loại loại hình công bố.
+
+4.5. Quản lý hội thảo, seminar và sự kiện khoa học
+Chức năng này dùng để quản lý các hoạt động học thuật trong trường:
+Tạo sự kiện khoa học
+Phân loại: hội thảo, tọa đàm, seminar, workshop, webinar, diễn đàn học thuật
+Quản lý thời gian, địa điểm, đơn vị tổ chức
+Quản lý diễn giả
+Quản lý người tham dự
+Quản lý bài tham luận
+Quản lý giấy mời, chương trình, tài liệu
+Ghi nhận minh chứng tổ chức
+Tạo báo cáo sau sự kiện
+Thống kê số lượng sự kiện theo đơn vị và thời gian
+AI cần hỗ trợ tạo thư mời, chương trình hội thảo, mô tả sự kiện, thông cáo báo chí, báo cáo tổng kết, biên bản tọa đàm và tóm tắt nội dung seminar.
+
+4.6. Quản lý nhóm nghiên cứu
+Hệ thống cần hỗ trợ thành lập và quản lý các nhóm nghiên cứu:
+Tên nhóm nghiên cứu
+Trưởng nhóm
+Thành viên
+Lĩnh vực nghiên cứu
+Mục tiêu hoạt động
+Kế hoạch nghiên cứu hằng năm
+Đề tài đang triển khai
+Công bố của nhóm
+Sản phẩm khoa học
+Kinh phí được cấp
+Đối tác hợp tác
+Báo cáo hoạt động định kỳ
+AI cần hỗ trợ gợi ý thành viên phù hợp dựa trên hồ sơ nghiên cứu, phát hiện các giảng viên có cùng lĩnh vực nghiên cứu, gợi ý chủ đề nghiên cứu liên ngành và đề xuất hướng phát triển nhóm nghiên cứu.
+
+4.7. Quản lý kinh phí nghiên cứu
+Hệ thống cần theo dõi kinh phí liên quan đến đề tài và hoạt động khoa học:
+Tổng kinh phí được duyệt
+Nguồn kinh phí
+Dự toán chi tiết
+Các khoản đã giải ngân
+Các khoản đã thanh toán
+Các khoản còn lại
+Chứng từ đính kèm
+Lịch sử cập nhật
+Trạng thái quyết toán
+Cảnh báo vượt dự toán
+Báo cáo tài chính theo đề tài, đơn vị, năm
+AI có thể hỗ trợ kiểm tra sự phù hợp giữa nội dung chi và dự toán, tóm tắt tình hình sử dụng kinh phí, phát hiện khoản mục bất thường và tạo báo cáo tài chính sơ bộ.
+
+4.8. Quản lý quy trình phê duyệt
+Ứng dụng cần có workflow phê duyệt linh hoạt:
+Giảng viên tạo hồ sơ
+Khoa kiểm tra và phê duyệt cấp đơn vị
+Phòng Quản lý Khoa học kiểm tra cấp trường
+Hội đồng đánh giá nếu cần
+Lãnh đạo phê duyệt cuối cùng
+Hồ sơ được trả lại khi thiếu thông tin
+Người dùng nhận thông báo khi cần chỉnh sửa
+Lưu toàn bộ lịch sử xử lý
+Ghi nhận người xử lý, thời gian xử lý, nội dung góp ý
+Các trạng thái cơ bản:
+Bản nháp
+Đã gửi
+Khoa yêu cầu chỉnh sửa
+Khoa đã duyệt
+Phòng Quản lý Khoa học yêu cầu chỉnh sửa
+Đang chờ hội đồng
+Đã phê duyệt
+Đang thực hiện
+Chậm tiến độ
+Đã nghiệm thu
+Không đạt
+Đã lưu trữ
+
+4.9. Kho tài liệu và minh chứng
+Hệ thống cần có kho lưu trữ tài liệu khoa học:
+Thuyết minh đề tài
+Báo cáo định kỳ
+Báo cáo tổng kết
+Biên bản họp hội đồng
+Quyết định giao đề tài
+Minh chứng công bố
+Bản scan sách, bài báo, giấy chứng nhận
+Hợp đồng nghiên cứu
+Chứng từ tài chính
+Tài liệu hội thảo
+Mẫu biểu hành chính
+AI cần hỗ trợ tìm kiếm thông minh trong kho tài liệu, tóm tắt nội dung file, trả lời câu hỏi dựa trên văn bản đã tải lên và trích xuất thông tin quan trọng từ tài liệu.
+
+4.10. Báo cáo và thống kê
+Hệ thống cần tạo được các báo cáo sau:
+Báo cáo tổng hợp hoạt động khoa học toàn trường
+Báo cáo theo khoa, viện, trung tâm
+Báo cáo theo giảng viên
+Báo cáo theo năm học
+Báo cáo công bố khoa học
+Báo cáo đề tài nghiên cứu
+Báo cáo kinh phí nghiên cứu
+Báo cáo phục vụ kiểm định chất lượng
+Báo cáo phục vụ xếp hạng đại học
+Báo cáo phục vụ chiến lược phát triển khoa học công nghệ
+Báo cáo sản phẩm nghiên cứu có khả năng chuyển giao
+AI cần hỗ trợ tự động viết báo cáo theo mẫu, tạo phần nhận xét, phân tích xu hướng, phát hiện điểm mạnh, điểm yếu và đề xuất định hướng phát triển nghiên cứu.
+
+5. Các chức năng AI cần tích hợp
+5.1. AI Assistant cho Phòng Quản lý Khoa học
+Một chatbot nội bộ giúp cán bộ quản lý hỏi đáp về:
+Quy chế nghiên cứu khoa học
+Quy trình đăng ký đề tài
+Quy định nghiệm thu
+Quy định công bố
+Quy định tính điểm nghiên cứu
+Quy định kinh phí
+Mẫu biểu hành chính
+Tình trạng hồ sơ trong hệ thống
+Số liệu thống kê khoa học
+AI Assistant cần trả lời dựa trên dữ liệu nội bộ và tài liệu quy định được tải lên hệ thống.
+
+5.2. AI hỗ trợ viết và kiểm tra thuyết minh đề tài
+AI cần hỗ trợ giảng viên:
+Viết nháp tên đề tài
+Gợi ý mục tiêu nghiên cứu
+Gợi ý câu hỏi nghiên cứu
+Gợi ý phương pháp nghiên cứu
+Gợi ý sản phẩm đầu ra
+Kiểm tra tính logic giữa mục tiêu, nội dung, phương pháp và sản phẩm
+Gợi ý chỉnh sửa văn phong học thuật
+Tóm tắt thuyết minh đề tài
+Phát hiện các phần còn thiếu trong hồ sơ
+
+5.3. AI trích xuất dữ liệu từ tài liệu
+Khi người dùng tải lên bài báo, báo cáo hoặc minh chứng, AI cần có khả năng:
+Nhận diện tiêu đề
+Nhận diện tác giả
+Nhận diện năm công bố
+Nhận diện DOI
+Nhận diện tên tạp chí
+Nhận diện abstract
+Nhận diện từ khóa
+Gợi ý loại công bố
+Gợi ý lĩnh vực nghiên cứu
+Tạo bản tóm tắt ngắn
+
+5.4. AI tạo báo cáo tự động
+AI cần tạo báo cáo từ dữ liệu trong hệ thống:
+Báo cáo hoạt động khoa học của một giảng viên
+Báo cáo hoạt động khoa học của một khoa
+Báo cáo tổng kết hoạt động khoa học toàn trường
+Báo cáo tình hình đề tài đang triển khai
+Báo cáo công bố quốc tế
+Báo cáo phục vụ kiểm định
+Báo cáo phục vụ hội nghị tổng kết năm học
+Báo cáo cần có cấu trúc rõ ràng gồm: tổng quan, số liệu chính, phân tích, nhận xét, vấn đề tồn tại và khuyến nghị.
+
+5.5. AI phân tích xu hướng nghiên cứu
+AI cần phân tích dữ liệu công bố và đề tài để:
+Xác định lĩnh vực nghiên cứu mạnh của trường
+Xác định lĩnh vực có tiềm năng phát triển
+Phát hiện các chủ đề nghiên cứu mới nổi
+Gợi ý hướng nghiên cứu liên ngành
+Gợi ý nhóm giảng viên có thể hợp tác
+Gợi ý đối tác học thuật hoặc doanh nghiệp phù hợp
+
+5.6. AI kiểm tra hồ sơ và cảnh báo rủi ro
+AI cần hỗ trợ kiểm tra:
+Hồ sơ đề tài thiếu thông tin
+Công bố thiếu minh chứng
+Đề tài chậm tiến độ
+Kinh phí có dấu hiệu vượt dự toán
+Sản phẩm đầu ra chưa khớp với cam kết
+Hồ sơ chưa đúng biểu mẫu
+Công bố có thông tin trùng lặp
+Báo cáo nghiệm thu thiếu nội dung quan trọng
+
+6. Các bảng dữ liệu chính
+Ứng dụng cần có các bảng dữ liệu cơ bản sau:
+users
+Lưu thông tin tài khoản người dùng.
+Trường dữ liệu gợi ý:
+id
+full_name
+email
+password_hash
+role
+department_id
+academic_title
+degree
+phone
+status
+created_at
+updated_at
+departments
+Lưu thông tin khoa, viện, trung tâm, phòng ban.
+Trường dữ liệu gợi ý:
+id
+name
+type
+parent_id
+description
+status
+created_at
+updated_at
+researcher_profiles
+Lưu hồ sơ khoa học cá nhân.
+Trường dữ liệu gợi ý:
+id
+user_id
+research_fields
+keywords
+orcid
+google_scholar_url
+scopus_id
+wos_id
+biography_vi
+biography_en
+cv_file_url
+created_at
+updated_at
+research_projects
+Lưu thông tin đề tài nghiên cứu.
+Trường dữ liệu gợi ý:
+id
+code
+title_vi
+title_en
+project_level
+research_field
+principal_investigator_id
+department_id
+start_date
+end_date
+budget
+funding_source
+objectives
+methodology
+expected_outputs
+status
+progress_percentage
+created_at
+updated_at
+project_members
+Lưu thành viên tham gia đề tài.
+Trường dữ liệu gợi ý:
+id
+project_id
+user_id
+role_in_project
+workload_percentage
+created_at
+publications
+Lưu công bố khoa học.
+Trường dữ liệu gợi ý:
+id
+title
+publication_type
+authors
+journal_or_conference
+publisher
+year
+doi
+issn_isbn
+index_type
+research_field
+department_id
+evidence_file_url
+verification_status
+score
+created_by
+approved_by
+created_at
+updated_at
+conferences
+Lưu hội thảo, seminar, sự kiện khoa học.
+Trường dữ liệu gợi ý:
+id
+title
+event_type
+organizer
+department_id
+start_date
+end_date
+location
+speakers
+description
+report_file_url
+status
+created_at
+updated_at
+research_groups
+Lưu nhóm nghiên cứu.
+Trường dữ liệu gợi ý:
+id
+name
+leader_id
+department_id
+research_field
+description
+objectives
+status
+created_at
+updated_at
+documents
+Lưu tài liệu, minh chứng, file đính kèm.
+Trường dữ liệu gợi ý:
+id
+related_type
+related_id
+file_name
+file_url
+file_type
+uploaded_by
+ai_summary
+extracted_metadata
+created_at
+workflows
+Lưu lịch sử phê duyệt.
+Trường dữ liệu gợi ý:
+id
+entity_type
+entity_id
+from_status
+to_status
+action_by
+comment
+created_at
+notifications
+Lưu thông báo hệ thống.
+Trường dữ liệu gợi ý:
+id
+user_id
+title
+message
+type
+is_read
+created_at
+
+7. Yêu cầu giao diện
+Giao diện cần hiện đại, rõ ràng, dễ sử dụng cho cán bộ đại học.
+Các màn hình chính:
+Trang đăng nhập
+Dashboard tổng quan
+Quản lý người dùng
+Quản lý đơn vị
+Hồ sơ khoa học cá nhân
+Danh sách đề tài
+Tạo đề tài mới
+Chi tiết đề tài
+Quy trình phê duyệt đề tài
+Danh sách công bố
+Tạo công bố mới
+Quản lý hội thảo
+Quản lý nhóm nghiên cứu
+Quản lý kinh phí
+Kho tài liệu
+Trung tâm báo cáo
+AI Assistant
+Cấu hình hệ thống
+Giao diện nên có sidebar bên trái, header phía trên, bảng dữ liệu có tìm kiếm, lọc, phân trang, nút xuất Excel/PDF và các biểu đồ trực quan.
+
+8. Yêu cầu phân quyền
+Hệ thống cần có phân quyền theo vai trò:
+Admin
+Quản lý toàn bộ hệ thống
+Quản lý tài khoản
+Quản lý phân quyền
+Cấu hình danh mục
+Xem và chỉnh sửa toàn bộ dữ liệu
+Science Office
+Quản lý đề tài, công bố, hội thảo, báo cáo
+Duyệt hồ sơ
+Tạo báo cáo toàn trường
+Quản lý quy trình nghiệp vụ
+Faculty Manager
+Xem dữ liệu của đơn vị mình
+Phê duyệt cấp khoa
+Tạo báo cáo cấp đơn vị
+Researcher
+Quản lý hồ sơ cá nhân
+Tạo đề tài
+Khai báo công bố
+Nộp minh chứng
+Theo dõi trạng thái hồ sơ
+Finance Officer
+Xem và cập nhật dữ liệu kinh phí
+Theo dõi giải ngân và quyết toán
+Tạo báo cáo tài chính đề tài
+Leadership
+Xem dashboard
+Xem báo cáo tổng hợp
+Xem phân tích chiến lược
+Không trực tiếp chỉnh sửa hồ sơ nghiệp vụ, trừ khi được cấp quyền
+
+9. Yêu cầu kỹ thuật gợi ý cho Claude Code
+Hãy xây dựng một web application full-stack với các công nghệ sau:
+Frontend: Next.js, React, TypeScript
+UI: Tailwind CSS, shadcn/ui
+Backend: Next.js API routes hoặc Node.js backend
+Database: PostgreSQL
+ORM: Prisma
+Authentication: NextAuth hoặc hệ thống đăng nhập JWT
+File upload: lưu file local trong giai đoạn MVP, có thể mở rộng sang S3 hoặc cloud storage
+AI integration: tạo module AI service riêng để sau này kết nối OpenAI API, Claude API hoặc mô hình nội bộ
+Charts: Recharts hoặc Chart.js
+Export: hỗ trợ xuất Excel và PDF
+Role-based access control: phân quyền theo vai trò người dùng
+
+10. Yêu cầu MVP phiên bản đầu tiên
+Phiên bản MVP cần ưu tiên các chức năng sau:
+Đăng nhập và phân quyền người dùng
+Dashboard tổng quan
+Quản lý đơn vị
+Quản lý hồ sơ khoa học cá nhân
+Quản lý đề tài nghiên cứu
+Quản lý công bố khoa học
+Quản lý hội thảo khoa học
+Quản lý file minh chứng
+Workflow phê duyệt cơ bản
+Báo cáo thống kê cơ bản
+AI Assistant bản đầu tiên
+AI tạo tóm tắt hồ sơ, đề tài và công bố
+
+11. Prompt dùng cho Claude Code
+Build a full-stack web application named “UniResearch AI” for managing scientific research activities in a university.
+The application should support research project management, researcher profiles, scientific publications, conferences, research groups, funding, document storage, approval workflows, dashboards, reports, and AI-assisted research administration.
+Use the following technology stack:
+Next.js
+React
+TypeScript
+Tailwind CSS
+shadcn/ui
+PostgreSQL
+Prisma ORM
+NextAuth or JWT authentication
+Recharts for charts
+Modular AI service layer for future connection to OpenAI API, Claude API, or local LLM
+Main requirements:
+Create a clean admin dashboard layout with sidebar navigation and top header.
+Implement authentication and role-based access control.
+Roles include: Admin, Science Office, Faculty Manager, Researcher, Finance Officer, and Leadership.
+Create database schema using Prisma for users, departments, researcher profiles, research projects, project members, publications, conferences, research groups, documents, workflows, notifications, and AI logs.
+Build CRUD pages for:
+Users
+Departments
+Researcher Profiles
+Research Projects
+Publications
+Conferences
+Research Groups
+Documents
+Build a dashboard page showing key research indicators:
+Total research projects
+Active projects
+Completed projects
+Total publications
+International publications
+Domestic publications
+Total conferences
+Total research funding
+Projects by status
+Publications by year
+Publications by department
+Build approval workflow for research projects and publications.
+Each workflow should store status changes, comments, action user, and action time.
+Build file upload for evidence documents.
+Build report pages with filters by year, department, project level, publication type, and researcher.
+Add export buttons for Excel and PDF.
+Add AI Assistant page with a chat interface.
+Create AI service functions:
+summarizeResearchProject
+summarizePublication
+generateResearcherBio
+checkProjectProposalCompleteness
+generateDepartmentResearchReport
+suggestResearchTopics
+extractPublicationMetadata
+For the MVP, implement AI service with mock responses first, but structure the code so real AI APIs can be added later through environment variables.
+Use professional Vietnamese labels in the user interface.
+Make the UI suitable for a university administrative system: clean, formal, responsive, and easy to use.
+Seed the database with sample departments, users, research projects, publications, and conferences.
+Provide clear folder structure, reusable components, type-safe APIs, and clean code.
+Include README instructions for installation, environment variables, database migration, seed data, and running the app.
+Prioritize a working MVP first, then keep the structure scalable for future expansion.
+Suggested main navigation:
+Dashboard
+Hồ sơ khoa học
+Đề tài nghiên cứu
+Công bố khoa học
+Hội thảo khoa học
+Nhóm nghiên cứu
+Kinh phí nghiên cứu
+Kho tài liệu
+Quy trình phê duyệt
+Báo cáo thống kê
+AI Assistant
+Quản trị hệ thống
+Please generate the complete project structure and implement the MVP step by step. Start with database schema, authentication, layout, dashboard, and core CRUD modules.
+Nên triển khai MVP theo thứ tự: đăng nhập/phân quyền → cơ sở dữ liệu → dashboard → đề tài → công bố → hồ sơ nhà khoa học → workflow → AI Assistant. Cách này giúp app có khung quản trị ổn định trước, sau đó mới mở rộng các chức năng AI nâng cao.
+

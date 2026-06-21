@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend (lint + tests)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: aisrm1
+          POSTGRES_PASSWORD: aisrm1
+          POSTGRES_DB: aisrm1_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U aisrm1"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://aisrm1:aisrm1@localhost:5432/aisrm1_test
+      AUTH_SECRET: ci-test-secret-please-change-32-characters
+      STORAGE_DRIVER: local
+      STORAGE_LOCAL_PATH: /tmp/aisrm1_storage
+      API_BASE_URL: http://localhost:8000
+      TASK_DRIVER: local
+      LLM_PROVIDER: mock
+      EMBEDDING_PROVIDER: mock
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,documents]"
+      - name: Lint (ruff)
+        run: ruff check app
+      - name: Enable pgvector extension
+        run: PGPASSWORD=aisrm1 psql -h localhost -U aisrm1 -d aisrm1_test -c "CREATE EXTENSION IF NOT EXISTS vector; CREATE EXTENSION IF NOT EXISTS unaccent; CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+      - name: Migrate
+        run: python -m app.cli migrate
+      - name: Tests
+        run: python -W ignore -m pytest -q
+
+  frontend:
+    name: Frontend (typecheck + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: npm install
+      - name: Typecheck
+        run: npm run typecheck --if-present
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
