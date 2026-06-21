@@ -44,3 +44,4 @@ storage_local/
 # Logs
 *.log
 logs/
+cloud-sql-proxy
