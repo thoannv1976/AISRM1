@@ -7,11 +7,14 @@ from app.api import (
     auth,
     dashboards,
     documents,
+    ethics,
     funding,
+    kpi,
     organization,
     outputs,
     projects,
     proposals,
+    reports,
     researchers,
     reviews,
     users,
@@ -32,3 +35,6 @@ api_router.include_router(documents.router, prefix="/documents", tags=["document
 api_router.include_router(ai.router, prefix="/ai", tags=["ai"])
 api_router.include_router(workflow.router, tags=["workflow"])
 api_router.include_router(dashboards.router, prefix="/dashboards", tags=["dashboards"])
+api_router.include_router(reports.router, prefix="/reports", tags=["reports"])
+api_router.include_router(ethics.router, prefix="/ethics", tags=["ethics"])
+api_router.include_router(kpi.router, tags=["kpi"])

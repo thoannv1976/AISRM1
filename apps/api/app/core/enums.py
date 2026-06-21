@@ -246,3 +246,38 @@ class AIOutputStatus(StrEnum):
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
     STALE = "STALE"
+
+
+# ----- Ethics & integrity -----
+class EthicsStatus(StrEnum):
+    DRAFT = "DRAFT"
+    SUBMITTED = "SUBMITTED"
+    SCREENING = "SCREENING"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    REVISION = "REVISION"
+    APPROVED = "APPROVED"
+    EXEMPT = "EXEMPT"
+    REJECTED = "REJECTED"
+    EXPIRED = "EXPIRED"
+
+
+class EthicsReviewType(StrEnum):
+    EXEMPT = "EXEMPT"
+    EXPEDITED = "EXPEDITED"
+    FULL = "FULL"
+
+
+# ----- KPI & rewards -----
+class KPIRunStatus(StrEnum):
+    DRAFT = "DRAFT"
+    FROZEN = "FROZEN"
+
+
+class RewardStatus(StrEnum):
+    DRAFT = "DRAFT"
+    SUBMITTED = "SUBMITTED"
+    UNIT_CONFIRMED = "UNIT_CONFIRMED"
+    OFFICE_REVIEWED = "OFFICE_REVIEWED"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    PAID = "PAID"

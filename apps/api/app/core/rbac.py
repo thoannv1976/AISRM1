@@ -35,6 +35,9 @@ MODULES = [
     "audit",
     "admin",
     "integrations",
+    "ethics",
+    "kpi",
+    "rewards",
 ]
 
 
@@ -65,6 +68,9 @@ BUILTIN_ROLE_PERMISSIONS: dict[str, list[str]] = {
         "tasks.*",
         "reports.*",
         "dashboards.*",
+        "ethics.*",
+        "kpi.*",
+        "rewards.*",
         "audit.read",
         "admin.config",
         "integrations.read",
@@ -92,6 +98,14 @@ BUILTIN_ROLE_PERMISSIONS: dict[str, list[str]] = {
         "tasks.*",
         "reports.*",
         "dashboards.read",
+        "ethics.read",
+        "ethics.update",
+        "ethics.decide",
+        "kpi.read",
+        "kpi.run",
+        "rewards.read",
+        "rewards.update",
+        "rewards.approve",
     ],
     SystemRole.EXECUTIVE: [
         "organizations.read",
@@ -106,6 +120,9 @@ BUILTIN_ROLE_PERMISSIONS: dict[str, list[str]] = {
         "reports.read",
         "dashboards.read",
         "finance.read",
+        "ethics.read",
+        "kpi.read",
+        "rewards.read",
     ],
     SystemRole.AUDITOR: [
         "audit.read",
@@ -117,6 +134,9 @@ BUILTIN_ROLE_PERMISSIONS: dict[str, list[str]] = {
         "outputs.read",
         "documents.read",
         "ai.read",
+        "ethics.read",
+        "kpi.read",
+        "rewards.read",
     ],
     # Unit roles
     "UNIT_HEAD": [
@@ -163,6 +183,12 @@ BUILTIN_ROLE_PERMISSIONS: dict[str, list[str]] = {
         "tasks.read",
         "tasks.update",
         "dashboards.read",
+        "ethics.read",
+        "ethics.create",
+        "ethics.update",
+        "kpi.read",
+        "rewards.read",
+        "rewards.create",
     ],
     "PROJECT_MEMBER": [
         "proposals.read",
@@ -200,6 +226,13 @@ BUILTIN_ROLE_PERMISSIONS: dict[str, list[str]] = {
         "reviews.read",
         "documents.read",
         "ai.run",
+        "tasks.read",
+        "tasks.update",
+    ],
+    "ETHICS_REVIEWER": [
+        "ethics.read",
+        "ethics.review",
+        "documents.read",
         "tasks.read",
         "tasks.update",
     ],

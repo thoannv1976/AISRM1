@@ -20,10 +20,13 @@ from app.models.reviews import (
     ConflictDeclaration,
     Council,
     CouncilMeeting,
+    CouncilMember,
+    Decision,
     Review,
     ReviewAssignment,
     ReviewerProfile,
     ReviewScore,
+    Vote,
 )
 from app.schemas.reviews import (
     AcceptIn,
@@ -298,3 +301,168 @@ def create_meeting(
     db.add(m)
     db.flush()
     return {"ok": True, "meeting_id": str(m.id)}
+
+
+# ----- Review assignments (reviewer inbox) -----
+@router.get("/review-assignments", response_model=Page[AssignmentOut])
+def list_assignments(
+    proposal_id: uuid.UUID | None = None,
+    mine: bool = False,
+    db: Session = Depends(get_db),
+    params: PageParams = Depends(page_params),
+    principal: Principal = Depends(require("reviews.read", "reviews.update")),
+) -> Page[AssignmentOut]:
+    stmt = select(ReviewAssignment).where(
+        ReviewAssignment.organization_id == principal.organization_id
+    )
+    if proposal_id:
+        stmt = stmt.where(ReviewAssignment.proposal_id == proposal_id)
+    if mine:
+        # reviewer profiles linked to this user
+        my_ids = [
+            r.id
+            for r in db.scalars(
+                select(ReviewerProfile).where(ReviewerProfile.user_id == principal.id)
+            ).all()
+        ]
+        stmt = stmt.where(ReviewAssignment.reviewer_id.in_(my_ids or [uuid.uuid4()]))
+    stmt = stmt.order_by(ReviewAssignment.created_at.desc())
+    items, total = paginate(db, stmt, params)
+    return build_page([AssignmentOut.model_validate(i) for i in items], total, params)
+
+
+@router.get("/review-assignments/{assignment_id}", response_model=AssignmentOut)
+def get_assignment(
+    assignment_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("reviews.read", "reviews.update")),
+) -> AssignmentOut:
+    return AssignmentOut.model_validate(
+        get_org_scoped(db, ReviewAssignment, assignment_id, principal)
+    )
+
+
+# ----- Council membership & meeting workspace -----
+@router.post("/councils/{council_id}/members", status_code=201)
+def add_member(
+    council_id: uuid.UUID,
+    member_name: str,
+    role: str = "MEMBER",
+    user_id: uuid.UUID | None = None,
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("councils.update")),
+) -> dict:
+    council = get_org_scoped(db, Council, council_id, principal)
+    db.add(
+        CouncilMember(
+            organization_id=principal.organization_id,
+            council_id=council.id,
+            member_name=member_name,
+            role=role,
+            user_id=user_id,
+        )
+    )
+    return {"ok": True}
+
+
+@router.get("/councils/{council_id}/detail")
+def council_detail(
+    council_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("councils.read")),
+) -> dict:
+    c = get_org_scoped(db, Council, council_id, principal)
+    members = db.scalars(select(CouncilMember).where(CouncilMember.council_id == c.id)).all()
+    meetings = db.scalars(select(CouncilMeeting).where(CouncilMeeting.council_id == c.id)).all()
+    return {
+        "council": CouncilOut.model_validate(c).model_dump(mode="json"),
+        "members": [{"id": str(m.id), "name": m.member_name, "role": m.role} for m in members],
+        "meetings": [
+            {
+                "id": str(m.id),
+                "title": m.title,
+                "status": m.status,
+                "quorum_required": m.quorum_required,
+                "meeting_at": m.meeting_at.isoformat() if m.meeting_at else None,
+            }
+            for m in meetings
+        ],
+    }
+
+
+@router.post("/council-meetings/{meeting_id}/votes", status_code=201)
+def cast_vote(
+    meeting_id: uuid.UUID,
+    proposal_id: uuid.UUID,
+    vote_value: str,
+    score: float | None = None,
+    comment: str | None = None,
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("councils.update")),
+) -> dict:
+    meeting = get_org_scoped(db, CouncilMeeting, meeting_id, principal)
+    if meeting.status == "FINALIZED":
+        raise InvalidStateTransition("Phiên họp đã chốt; không thể bỏ phiếu thêm.")
+    db.add(
+        Vote(
+            organization_id=principal.organization_id,
+            meeting_id=meeting.id,
+            proposal_id=proposal_id,
+            member_id=principal.id,
+            vote_value=vote_value,
+            score=score,
+            comment=comment,
+        )
+    )
+    return {"ok": True}
+
+
+@router.post("/council-meetings/{meeting_id}/finalize")
+def finalize_meeting(
+    meeting_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    principal: Principal = Depends(require("councils.update")),
+) -> dict:
+    meeting = get_org_scoped(db, CouncilMeeting, meeting_id, principal)
+    if meeting.status == "FINALIZED":
+        raise InvalidStateTransition("Phiên họp đã được chốt.")
+    votes = db.scalars(select(Vote).where(Vote.meeting_id == meeting.id)).all()
+    voters = {v.member_id for v in votes if v.member_id}
+    if meeting.quorum_required and len(voters) < meeting.quorum_required:
+        raise InvalidStateTransition(f"Chưa đủ quorum ({len(voters)}/{meeting.quorum_required}).")
+    # Aggregate per proposal.
+    agg: dict[str, dict] = {}
+    for v in votes:
+        key = str(v.proposal_id)
+        a = agg.setdefault(key, {"approve": 0, "reject": 0, "abstain": 0, "scores": []})
+        a[v.vote_value.lower()] = a.get(v.vote_value.lower(), 0) + 1
+        if v.score is not None:
+            a["scores"].append(float(v.score))
+    results = []
+    for pid, a in agg.items():
+        avg = round(sum(a["scores"]) / len(a["scores"]), 2) if a["scores"] else None
+        outcome = "APPROVED" if a["approve"] > a["reject"] else "REJECTED"
+        results.append({"proposal_id": pid, **a, "avg_score": avg, "consensus": outcome})
+        db.add(
+            Decision(
+                organization_id=principal.organization_id,
+                scope_type="proposal",
+                scope_id=uuid.UUID(pid),
+                decision_type="COUNCIL",
+                decision_date=datetime.now(tz=UTC),
+                outcome=outcome,
+                approved_by=principal.id,
+            )
+        )
+    meeting.status = "FINALIZED"
+    audit.record(
+        db,
+        action="council.finalize",
+        actor_id=principal.id,
+        organization_id=principal.organization_id,
+        entity_type="council_meeting",
+        entity_id=meeting.id,
+        metadata={"quorum_voters": len(voters)},
+    )
+    db.flush()
+    return {"ok": True, "results": results, "quorum_voters": len(voters)}

@@ -13,12 +13,26 @@ interface Reviewer {
   is_external: boolean;
 }
 
+interface Council {
+  id: string;
+  code: string;
+  name: string;
+  council_type: string;
+  status: string;
+}
+
 export default function ReviewsPage() {
   const [reviewers, setReviewers] = useState<Reviewer[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [pid, setPid] = useState("");
   const [sugg, setSugg] = useState<Suggestion[] | null>(null);
   const [busy, setBusy] = useState(false);
+  const [councils, setCouncils] = useState<Council[]>([]);
+  const [cmsg, setCmsg] = useState("");
+
+  async function loadCouncils() {
+    setCouncils((await api.get<Page<Council>>("/councils?limit=50")).items);
+  }
 
   useEffect(() => {
     api.get<Page<Reviewer>>("/reviewers?limit=50").then((r) => setReviewers(r.items));
@@ -26,6 +40,7 @@ export default function ReviewsPage() {
       setProposals(p.items);
       if (p.items[0]) setPid(p.items[0].id);
     });
+    loadCouncils();
   }, []);
 
   async function suggest() {
@@ -109,6 +124,65 @@ export default function ReviewsPage() {
           ))}
         </div>
       )}
+
+      {/* Council & quyết nghị */}
+      <div className="mt-8">
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="font-semibold text-slate-800">Hội đồng khoa học</h3>
+          <button
+            className="btn-ghost text-xs"
+            onClick={async () => {
+              const name = prompt("Tên hội đồng:");
+              if (!name) return;
+              await api.post("/councils", {
+                code: "HD-" + Date.now().toString().slice(-5),
+                name,
+                council_type: "SELECTION",
+              });
+              loadCouncils();
+            }}
+          >
+            + Tạo hội đồng
+          </button>
+        </div>
+        {cmsg && <div className="mb-2 rounded bg-slate-100 px-3 py-2 text-sm">{cmsg}</div>}
+        {councils.length === 0 ? (
+          <EmptyState message="Chưa có hội đồng." />
+        ) : (
+          <div className="card divide-y divide-slate-100">
+            {councils.map((c) => (
+              <div key={c.id} className="flex items-center justify-between p-3">
+                <div>
+                  <div className="text-sm font-medium text-slate-800">{c.name}</div>
+                  <div className="text-xs text-slate-400">
+                    {c.code} · {c.council_type} · {c.status}
+                  </div>
+                </div>
+                <button
+                  className="btn-ghost text-xs"
+                  onClick={async () => {
+                    // create a meeting then finalize (demo of quorum/decision flow)
+                    const r = await api.post<{ meeting_id: string }>(`/councils/${c.id}/meetings`, {
+                      title: "Phiên họp " + new Date().toLocaleDateString("vi-VN"),
+                      quorum_required: 0,
+                    });
+                    try {
+                      const f = await api.post<{ quorum_voters: number }>(
+                        `/council-meetings/${r.meeting_id}/finalize`
+                      );
+                      setCmsg(`Đã tạo & chốt phiên họp (quorum: ${f.quorum_voters}).`);
+                    } catch (e: any) {
+                      setCmsg("⚠ " + e.message);
+                    }
+                  }}
+                >
+                  Tạo & chốt phiên họp
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

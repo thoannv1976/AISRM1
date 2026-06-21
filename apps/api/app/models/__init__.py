@@ -69,6 +69,15 @@ from app.models.proposals import (  # noqa: F401
     Submission,
     WorkPackage,
 )
+from app.models.research_extra import (  # noqa: F401
+    EthicsApplication,
+    EthicsDecision,
+    EthicsReview,
+    KPIContribution,
+    KPIRuleVersion,
+    KPIRun,
+    RewardApplication,
+)
 from app.models.researchers import (  # noqa: F401
     ExpertiseTaxonomy,
     ResearcherExpertise,

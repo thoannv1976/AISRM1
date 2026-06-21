@@ -1,6 +1,16 @@
 # Trạng thái build AISRM1
 
-Cập nhật theo phiên build đầu tiên. Đối chiếu với roadmap (epic E1–E14).
+Cập nhật theo roadmap (epic E1–E14).
+
+## Bổ sung phiên 2 (Reports + Council/Review + Ethics + KPI/Reward)
+- ✅ **M16 Báo cáo R01–R28**: chạy báo cáo → snapshot bất biến (hash) → xuất **Excel/CSV/Word**; UI `/reports`.
+- ✅ **M6 Hội đồng (nâng cao)**: review assignment inbox, council members/meetings, **bỏ phiếu + quorum + finalize → tạo quyết nghị**.
+- ✅ **M11 Đạo đức & liêm chính**: hồ sơ Restricted, state machine DRAFT→SUBMITTED→SCREENING→UNDER_REVIEW→APPROVED/EXEMPT/REJECTED; UI `/ethics`.
+- ✅ **M12 KPI & khen thưởng**: KPI run tái lập (rule hash, contributions theo tác giả), reward workflow DRAFT→…→APPROVED→PAID; UI `/kpi`.
+- Tests: 34 pass · 19 route frontend.
+
+---
+
 
 ## ✅ Đã hoàn thành & kiểm thử
 | Epic | Hạng mục | Trạng thái |
